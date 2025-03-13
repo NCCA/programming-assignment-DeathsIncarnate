@@ -1,1 +1,10 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/hhQzWvz6)
+# Jacques Moss CFGAA Assignement 
+
+## Ideas
+
+For my assignment I am going to choose one of the following.
+
+1. Simple C++ WebGPU demo
+2. A really cool tool for QT
+3. A game
+
