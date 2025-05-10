@@ -250,11 +250,6 @@ void Emitter::update(float _dt)
     // Calculate densities first
     calculateAllDensities();
 
-    // Apply visualizations if enabled
-    if(m_showDensity)
-        visualizeDensities();
-    else if(m_showSmoothing)
-        visualizeSmoothing();
     // else
     // {
     //     // Default appearance when not visualizing
