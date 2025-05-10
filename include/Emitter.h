@@ -30,10 +30,15 @@ class Emitter
     void visualizeSmoothing();
     void toggleDensityVisualization() { m_showDensity = !m_showDensity; }
     void toggleSmoothingVisualization() { m_showSmoothing = !m_showSmoothing; }
-    void simulationStep(float _dt);
     ngl::Vec3 calculatePressureForce(size_t _particleIndex) const;
     float convertDensityToPressure(float _density) const;
     float calculateSharedPressure(float densityA, float densityB) const;
+    ngl::Vec3 calculateViscosityForce(size_t particleIndex) const;
+    void simulationStep(float _dt);
+    void renderBoundingBox() const;
+
+    void setCursorPos(const ngl::Vec3 &_pos, float _radius, float _strength);
+    void toggleCursorInteraction() { m_cursorInteraction = !m_cursorInteraction; }
 
 
 
@@ -64,7 +69,7 @@ class Emitter
     std::vector<float> m_ppressure;    // Pressures
 
     // SPH parameters
-    float m_smoothingRadius = 1.0f;   // Adjust based on scale
+    float m_smoothingRadius = 100.0f;   // Adjust based on scale
     float m_particleMass = 1.0f;      // Typically 1.0 for simplicity
     float m_restDensity = 1000.0f;    // Water-like density
     std::vector<float> m_densities;
@@ -73,10 +78,22 @@ class Emitter
     float m_maxDensity = 0.0f;
     // Add these to your Emitter.h in the private section:
     float m_targetDensity = 1000.0f; // Typical water density kg/m³
-    float m_pressureMultiplier = 100.0f; // Stiffness constant
+    float m_pressureMultiplier = 1.0f; // Stiffness constant
+    float m_viscosityStrength = 0.1f;
+    float m_damping = 0.01f;
+
+    std::unique_ptr<ngl::MultiBufferVAO> m_boxVAO;
+    void initBoundingBoxVAO();
 
     // float m_pressureStiffness = 100.0f;   // Adjusts fluid compressibility
     // float m_viscosity = 0.1f;            // For damping oscillations
+
+    ngl::Vec3 m_cursorPos;
+    float m_cursorRadius = 5.0f;
+    float m_cursorStrength = 10.0f;
+    bool m_cursorInteraction = false;
+
+    ngl::Vec3 calculateCursorForce(size_t particleIdx) const;
 
 
 

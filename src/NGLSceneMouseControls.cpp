@@ -4,14 +4,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::mouseMoveEvent(QMouseEvent *_event)
 {
-// note the method buttons() is the button state when event was called
-// that is different from button() which is used to check which button was
-// pressed when the mousePress/Release event is generated
 #if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
   auto position = _event->position();
 #else
   auto position = _event->pos();
 #endif
+
+  // Handle camera rotation (existing code)
   if (m_win.rotate && _event->buttons() == Qt::LeftButton)
   {
     int diffx = position.x() - m_win.origX;
@@ -20,9 +19,8 @@ void NGLScene::mouseMoveEvent(QMouseEvent *_event)
     m_win.spinYFace += static_cast<int>(0.5f * diffx);
     m_win.origX = position.x();
     m_win.origY = position.y();
-    update();
   }
-  // right mouse translate code
+  // Handle camera translation (existing code)
   else if (m_win.translate && _event->buttons() == Qt::RightButton)
   {
     int diffX = static_cast<int>(position.x() - m_win.origXPos);
@@ -31,9 +29,19 @@ void NGLScene::mouseMoveEvent(QMouseEvent *_event)
     m_win.origYPos = position.y();
     m_modelPos.m_x += INCREMENT * diffX;
     m_modelPos.m_y -= INCREMENT * diffY;
-    update();
   }
+  // Handle particle interaction (new code) - only when no other mouse operation
+  else if (!m_win.rotate && !m_win.translate)
+  {
+    // Convert screen coords to world coords
+    ngl::Vec3 worldPos = screenToWorld(position.x(), position.y());
+    // Set cursor properties
+    m_emitter->setCursorPos(worldPos, 5.0f, 3000000.0f);
+  }
+
+  update();
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::mousePressEvent(QMouseEvent *_event)

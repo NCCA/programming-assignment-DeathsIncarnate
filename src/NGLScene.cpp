@@ -79,6 +79,12 @@ void NGLScene::paintGL()
   glPointSize(5);
   ngl::ShaderLib::setUniform("MVP", m_project * m_view * mouseRotation);
   m_emitter -> render(m_win.width, m_win.height);
+
+  glPointSize(5);
+  ngl::ShaderLib::use(ngl::nglColourShader);
+  ngl::ShaderLib::setUniform("MVP", m_project * m_view * mouseRotation);
+  ngl::ShaderLib::setUniform("Colour", 1.0f, 1.0f, 1.0f, 1.0f);
+  //m_emitter -> renderBoundingBox();
   //m_emitter -> debug();
 
   ngl::ShaderLib::use(ngl::nglColourShader);
@@ -89,6 +95,42 @@ void NGLScene::paintGL()
   ngl::ShaderLib::use(ngl::nglTextShader);
   m_text -> renderText(10, 700, "Particle System");
 
+}
+
+// Correct screenToWorld implementation
+ngl::Vec3 NGLScene::screenToWorld(int _x, int _y) const
+{
+  // Convert to NDC space [-1,1]
+  float x = (2.0f * _x) / width() - 1.0f;
+  float y = 1.0f - (2.0f * _y) / height();
+
+  // Create ray in clip space
+  ngl::Vec4 rayClip(x, y, -1.0f, 1.0f);
+
+  // Transform to eye space
+  ngl::Mat4 invProject = m_project;
+  invProject.inverse();
+  ngl::Vec4 rayEye = invProject * rayClip;
+  rayEye = ngl::Vec4(rayEye.m_x, rayEye.m_y, -1.0f, 0.0f);
+
+  // Transform to world space
+  ngl::Mat4 invView = m_view;
+  invView.inverse();
+  ngl::Vec4 rayWorld = invView * rayEye;
+  ngl::Vec3 rayDir(rayWorld.m_x, rayWorld.m_y, rayWorld.m_z);
+  rayDir.normalize();
+
+  // Camera position (assuming m_view is a lookAt matrix)
+  ngl::Vec3 eye(m_view.m_30, m_view.m_31, m_view.m_32);
+
+  // Intersect with y=0 plane (ground)
+  if (rayDir.m_y != 0.0f)
+  {
+    float t = -eye.m_y / rayDir.m_y;
+    return eye + rayDir * t;
+  }
+
+  return ngl::Vec3(0.0f, 0.0f, 0.0f);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,12 +149,9 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   // we then switch on the key value and set the camera in the GLWindow
   switch (_event->key())
   {
-  case Qt::Key_D:
-    m_emitter->toggleDensityVisualization();
-    break;
 
-  case Qt::Key_W:
-    m_emitter->toggleSmoothingVisualization();
+  case Qt::Key_M:
+    m_emitter->toggleCursorInteraction();
     break;
 
   // escape key to quite
