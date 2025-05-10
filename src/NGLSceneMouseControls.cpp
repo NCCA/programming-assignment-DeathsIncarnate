@@ -30,14 +30,14 @@ void NGLScene::mouseMoveEvent(QMouseEvent *_event)
     m_modelPos.m_x += INCREMENT * diffX;
     m_modelPos.m_y -= INCREMENT * diffY;
   }
-  // Handle particle interaction (new code) - only when no other mouse operation
-  else if (!m_win.rotate && !m_win.translate)
-  {
-    // Convert screen coords to world coords
-    ngl::Vec3 worldPos = screenToWorld(position.x(), position.y());
-    // Set cursor properties
-    m_emitter->setCursorPos(worldPos, 5.0f, 3000000.0f);
-  }
+  // // Handle particle interaction (new code) - only when no other mouse operation
+  // else if (_event->buttons() != Qt::RightButton && _event->buttons() != Qt::LeftButton)
+  // {
+  //   // Convert screen coords to world coords
+  //   ngl::Vec3 worldPos = screenToWorld(position.x(), position.y());
+  //   // Set cursor properties
+  //   m_emitter->setCursorPos(worldPos, 20.0f, 5000000.0f);
+  // }
 
   update();
 }

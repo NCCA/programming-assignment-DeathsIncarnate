@@ -61,8 +61,6 @@ void NGLScene::initializeGL()
 
 }
 
-
-
 void NGLScene::paintGL()
 {
   // clear the screen and depth buffer
@@ -97,41 +95,41 @@ void NGLScene::paintGL()
 
 }
 
-// Correct screenToWorld implementation
-ngl::Vec3 NGLScene::screenToWorld(int _x, int _y) const
-{
-  // Convert to NDC space [-1,1]
-  float x = (2.0f * _x) / width() - 1.0f;
-  float y = 1.0f - (2.0f * _y) / height();
-
-  // Create ray in clip space
-  ngl::Vec4 rayClip(x, y, -1.0f, 1.0f);
-
-  // Transform to eye space
-  ngl::Mat4 invProject = m_project;
-  invProject.inverse();
-  ngl::Vec4 rayEye = invProject * rayClip;
-  rayEye = ngl::Vec4(rayEye.m_x, rayEye.m_y, -1.0f, 0.0f);
-
-  // Transform to world space
-  ngl::Mat4 invView = m_view;
-  invView.inverse();
-  ngl::Vec4 rayWorld = invView * rayEye;
-  ngl::Vec3 rayDir(rayWorld.m_x, rayWorld.m_y, rayWorld.m_z);
-  rayDir.normalize();
-
-  // Camera position (assuming m_view is a lookAt matrix)
-  ngl::Vec3 eye(m_view.m_30, m_view.m_31, m_view.m_32);
-
-  // Intersect with y=0 plane (ground)
-  if (rayDir.m_y != 0.0f)
-  {
-    float t = -eye.m_y / rayDir.m_y;
-    return eye + rayDir * t;
-  }
-
-  return ngl::Vec3(0.0f, 0.0f, 0.0f);
-}
+// // Correct screenToWorld implementation
+// ngl::Vec3 NGLScene::screenToWorld(int _x, int _y) const
+// {
+//   // Convert to NDC space [-1,1]
+//   float x = (2.0f * _x) / width() - 1.0f;
+//   float y = 1.0f - (2.0f * _y) / height();
+//
+//   // Create ray in clip space
+//   ngl::Vec4 rayClip(x, y, -1.0f, 1.0f);
+//
+//   // Transform to eye space
+//   ngl::Mat4 invProject = m_project;
+//   invProject.inverse();
+//   ngl::Vec4 rayEye = invProject * rayClip;
+//   rayEye = ngl::Vec4(rayEye.m_x, rayEye.m_y, -1.0f, 0.0f);
+//
+//   // Transform to world space
+//   ngl::Mat4 invView = m_view;
+//   invView.inverse();
+//   ngl::Vec4 rayWorld = invView * rayEye;
+//   ngl::Vec3 rayDir(rayWorld.m_x, rayWorld.m_y, rayWorld.m_z);
+//   rayDir.normalize();
+//
+//   // Camera position (assuming m_view is a lookAt matrix)
+//   ngl::Vec3 eye(invView.m_30, invView.m_31, invView.m_32);
+//
+//   // Intersect with y=0 plane (ground)
+//   if (rayDir.m_y != 0.0f)
+//   {
+//     float t = -eye.m_y / rayDir.m_y;
+//     return eye + rayDir * t;
+//   }
+//
+//   return ngl::Vec3(0.0f, 0.0f, 0.0f);
+// }
 
 //----------------------------------------------------------------------------------------------------------------------
 

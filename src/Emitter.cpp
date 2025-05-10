@@ -292,13 +292,13 @@ void Emitter::update(float _dt)
             m_psize[i] = std::clamp(m_psize[i], 0.0f, 5.0f);
             m_ppos[i].m_w = m_psize[i];
 
-            ngl::Vec3 cursorForce = calculateCursorForce(i);
+            //ngl::Vec3 cursorForce = calculateCursorForce(i);
 
             m_pcolour[i] = ngl::Random::getRandomColour3();
             ngl::Vec3 pressureForce = calculatePressureForce(i); /// 10.0f;
             ngl::Vec3 viscosityForce = calculateViscosityForce(i); /// 10.0f;
             ngl::Vec3 gravityForce(0.0f, -9.81f * m_particleMass, 0.0f);
-            ngl::Vec3 totalForce = pressureForce + gravityForce + viscosityForce + cursorForce * _dt;
+            ngl::Vec3 totalForce = pressureForce + gravityForce + viscosityForce * _dt; //+ (cursorForce*2000000) * _dt;
             m_pdir[i] = totalForce / m_particleMass / 200.0f; /// 10000.0f;
 
             resolveCollisions(i);
@@ -569,37 +569,46 @@ void Emitter::initializeParticles()
 
     // No leftover particles will be placed - m_maxParticles now equals exact grid count
 }
-
-void Emitter::setCursorPos(const ngl::Vec3 &_pos, float _radius, float _strength)
-{
-    m_cursorPos = _pos;
-    m_cursorRadius = _radius;
-    m_cursorStrength = _strength;
-}
-
-ngl::Vec3 Emitter::calculateCursorForce(size_t particleIdx) const
-{
-    if (!m_cursorInteraction) return ngl::Vec3(0.0f, 0.0f, 0.0f);
-
-    const ngl::Vec3 particlePos(m_ppos[particleIdx].m_x,
-                              m_ppos[particleIdx].m_y,
-                              m_ppos[particleIdx].m_z);
-
-    const ngl::Vec3 toCursor = particlePos - m_cursorPos;
-    const float dist = toCursor.length();
-
-    if (dist > m_cursorRadius || dist < 0.001f)
-        return ngl::Vec3(0.0f, 0.0f, 0.0f);
-
-    // Inverse square law for smooth repulsion
-    const float falloff = 1.0f - (dist / m_cursorRadius);
-    const float forceMagnitude = m_cursorStrength * falloff * falloff;
-
-    ngl::Vec3 normalized = toCursor;
-    normalized.normalize();
-    return normalized * forceMagnitude;
-}
-
+//
+// void Emitter::setCursorPos(const ngl::Vec3 &_pos, float _radius, float _strength)
+// {
+//     m_cursorPos = _pos;
+//     m_cursorRadius = _radius;
+//     m_cursorStrength = _strength;
+//     m_cursorInteraction = true; // ensure it's active
+// }
+//
+// ngl::Vec3 Emitter::calculateCursorForce(size_t particleIdx) const
+// {
+//     if (!m_cursorInteraction) return ngl::Vec3(0.0f, 0.0f, 0.0f);
+//
+//     const ngl::Vec3 particlePos(m_ppos[particleIdx].m_x,
+//                               m_ppos[particleIdx].m_y,
+//                               m_ppos[particleIdx].m_z);
+//
+//     const ngl::Vec3 toCursor = particlePos - m_cursorPos;
+//     const float dist = toCursor.length();
+//
+//     if (dist > m_cursorRadius || dist < 0.001f)
+//         return ngl::Vec3(0.0f, 0.0f, 0.0f);
+//
+//     // Inverse square law for smooth repulsion
+//     const float falloff = 1.0f - (dist / m_cursorRadius);
+//     const float forceMagnitude = m_cursorStrength * falloff * falloff;
+//
+//     ngl::Vec3 forceDir = toCursor;
+//     forceDir.normalize();
+//
+//     ngl::Vec3 force = forceDir * forceMagnitude;
+//
+//     // Debug output
+//     std::cout << "Particle " << particleIdx << " dist=" << dist
+//               << " force=(" << force.m_x << ", " << force.m_y << ", " << force.m_z << ")\n";
+//
+//
+//     return force;
+// }
+//
 
 void Emitter::render(int _width, int _height) const
 {
