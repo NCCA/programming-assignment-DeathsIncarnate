@@ -39,6 +39,11 @@ m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos
     m_targetDensity = m_restDensity;
     m_smoothingRadius = 2.0f * m_particleSpacing; // Typically 2x particle spacing
 
+    // Initialize spatial hashing
+    m_gridCellSize = m_smoothingRadius * 2.0f;
+    m_spatialLookup.resize(m_maxParticles);
+    m_startIndices.resize(m_maxParticles, std::numeric_limits<size_t>::max());
+
     initializeParticles();
 
     //m_vao = ngl::VAOFactory::createVAO(ngl::simpleVAO, GL_POINTS);
@@ -46,15 +51,101 @@ m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos
     m_vao->bind();
     m_vao->setData(ngl::MultiBufferVAO::VertexData(0,0)); // index 0 points
     m_vao->setData(ngl::MultiBufferVAO::VertexData(0,0)); // index 1 colours
-    m_vao->setData(ngl::MultiBufferVAO::VertexData(0,0)); // index 3 Densities
+    m_vao->setData(ngl::MultiBufferVAO::VertexData(0,0)); // index 2 Densities
     m_vao->unbind();
 
-    //initBoundingBoxVAO();
+    initBoundingBoxVAO();
 }
+
+// void Emitter::UpdateSpatialLookup()
+// {
+// #pragma omp parallel for
+//     for(size_t i = 0; i < m_maxParticles; ++i) {
+//         auto cellCoord = PositionToCellCoord(ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z));
+//         size_t cellKey = HashCell(cellCoord[0], cellCoord[1], cellCoord[2]);
+//         m_spatialLookup[i] = {i, cellKey};
+//     }
+//
+//     // Sort by cell key
+//     std::sort(m_spatialLookup.begin(), m_spatialLookup.end(),
+//         [](const SpatialEntry& a, const SpatialEntry& b) {
+//             return a.cellKey < b.cellKey;
+//         });
+//
+//     // Build start indices
+// #pragma omp parallel for
+//     for(size_t i = 0; i < m_spatialLookup.size(); ++i) {
+//         if(i == 0 || m_spatialLookup[i].cellKey != m_spatialLookup[i-1].cellKey) {
+//             m_startIndices[m_spatialLookup[i].cellKey] = i;
+//         }
+//     }
+// }
+//
+// std::array<int, 3> Emitter::PositionToCellCoord(const ngl::Vec3& point) const
+// {
+//     return {
+//         static_cast<int>(std::floor(point.m_x / m_gridCellSize)),
+//         static_cast<int>(std::floor(point.m_y / m_gridCellSize)),
+//         static_cast<int>(std::floor(point.m_z / m_gridCellSize))
+//     };
+// }
+//
+// size_t Emitter::HashCell(int cellX, int cellY, int cellZ) const
+// {
+//     const size_t p1 = 73856093;
+//     const size_t p2 = 19349663;
+//     const size_t p3 = 83492791;
+//     return (cellX * p1) ^ (cellY * p2) ^ (cellZ * p3);
+// }
+//
+// size_t Emitter::GetKeyFromHash(size_t hash) const
+// {
+//     return hash % m_maxParticles;
+// }
+//
+// void Emitter::ForEachNeighbor(size_t particleIdx, std::function<void(size_t)> callback)
+// {
+//     const ngl::Vec3& pos = ngl::Vec3(m_ppos[particleIdx].m_x, m_ppos[particleIdx].m_y, m_ppos[particleIdx].m_z);
+//     auto centerCell = PositionToCellCoord(pos);
+//     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
+//
+//     // Check all 27 surrounding cells (3x3x3)
+//     for(int dx = -1; dx <= 1; ++dx) {
+//         for(int dy = -1; dy <= 1; ++dy) {
+//             for(int dz = -1; dz <= 1; ++dz)
+//             {
+//                 size_t cellKey = HashCell(centerCell[0]+dx, centerCell[1]+dy, centerCell[2]+dz);
+//                 size_t key = GetKeyFromHash(cellKey);
+//                 size_t startIdx = m_startIndices[key];
+//
+//                 if(startIdx == std::numeric_limits<size_t>::max())
+//                     continue;
+//
+//                 // Iterate through all particles in this cell
+//                 for(size_t i = startIdx; i < m_spatialLookup.size(); ++i) {
+//                     if(m_spatialLookup[i].cellKey != key)
+//                         break;
+//
+//                     size_t otherIdx = m_spatialLookup[i].particleIndex;
+//                     if(particleIdx == otherIdx)
+//                         continue;
+//
+//                     float distSq = (m_ppos[otherIdx] - pos).lengthSquared();
+//                     if(distSq <= radiusSq) {
+//                         callback(otherIdx);
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
 size_t Emitter::size() const
 {
     return m_maxParticles;
 }
+
 
 // Standard cubic spline kernel (Müller et al.)
 // Optimized cubic spline kernel for 3D SPH
@@ -122,63 +213,76 @@ float Emitter::CalculateDensity(const ngl::Vec3& samplePoint)
     return density;
 }
 
-float Emitter::CalculateProperty(const ngl::Vec3& samplePoint,
-                               const std::vector<float>& particleProperties)
-{
-    float property = 0.0f;
-    const float radiusSq = m_smoothingRadius * m_smoothingRadius;
+// float Emitter::CalculateDensity(size_t particleIdx)
+// {
+//     float density = 0.0f;
+//     const ngl::Vec3& pos = ngl::Vec3(m_ppos[particleIdx].m_x, m_ppos[particleIdx].m_y, m_ppos[particleIdx].m_z);
+//
+//     ForEachNeighbor(particleIdx, [&](size_t otherIdx) {
+//         float dist = (m_ppos[otherIdx] - pos).length();
+//         density += m_particleMass * SmoothingKernel(m_smoothingRadius, dist);
+//     });
+//
+//     return density;
+// }
 
-    for (int i = 0; i < m_maxParticles; ++i)
-    {
-        const float dx = m_ppos[i].m_x - samplePoint.m_x;
-        const float dy = m_ppos[i].m_y - samplePoint.m_y;
-        const float dz = m_ppos[i].m_z - samplePoint.m_z;
-        const float dstSq = dx*dx + dy*dy + dz*dz;
+// float Emitter::CalculateProperty(const ngl::Vec3& samplePoint,
+//                                const std::vector<float>& particleProperties)
+// {
+//     float property = 0.0f;
+//     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
+//
+//     for (int i = 0; i < m_maxParticles; ++i)
+//     {
+//         const float dx = m_ppos[i].m_x - samplePoint.m_x;
+//         const float dy = m_ppos[i].m_y - samplePoint.m_y;
+//         const float dz = m_ppos[i].m_z - samplePoint.m_z;
+//         const float dstSq = dx*dx + dy*dy + dz*dz;
+//
+//         if (dstSq >= radiusSq) continue;
+//
+//         const float dst = std::sqrt(dstSq);
+//         const float influence = SmoothingKernel(m_smoothingRadius, dst);
+//         const ngl::Vec3 position3D(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z);
+//         const float density = CalculateDensity(position3D);
+//
+//         // Avoid division by zero
+//         if (density > 0.0f) {
+//             property += particleProperties[i] * m_particleMass * influence / density;
+//         }
+//     }
+//
+//     return property;
+// }
 
-        if (dstSq >= radiusSq) continue;
-
-        const float dst = std::sqrt(dstSq);
-        const float influence = SmoothingKernel(m_smoothingRadius, dst);
-        const ngl::Vec3 position3D(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z);
-        const float density = CalculateDensity(position3D);
-
-        // Avoid division by zero
-        if (density > 0.0f) {
-            property += particleProperties[i] * m_particleMass * influence / density;
-        }
-    }
-
-    return property;
-}
-
-ngl::Vec3 Emitter::CalculatePropertyGradient(const ngl::Vec3& samplePoint,
-                                           const std::vector<float>& particleProperties)
-{
-    ngl::Vec3 gradient(0.0f, 0.0f, 0.0f);
-    const float radiusSq = m_smoothingRadius * m_smoothingRadius;
-
-    for (size_t i = 0; i < m_maxParticles; ++i)
-    {
-        const ngl::Vec3 displacement = ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z) - samplePoint;
-        const float dstSq = displacement.lengthSquared();
-
-        if (dstSq >= radiusSq || dstSq == 0.0f)
-            continue;
-
-        const float dst = std::sqrt(dstSq);
-        const ngl::Vec3 dir = displacement / dst;  // Normalized direction vector
-        const float slope = SmoothingKernelDerivative(m_smoothingRadius, dst);
-        const float density = CalculateDensity(ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z));
-
-        // Avoid division by zero and accumulate gradient
-        if (density > 0.0f)
-        {
-            gradient += -particleProperties[i] * dir * slope * m_particleMass / density;
-        }
-    }
-
-    return gradient;
-}
+// ngl::Vec3 Emitter::CalculatePropertyGradient(const ngl::Vec3& samplePoint,
+//                                            const std::vector<float>& particleProperties)
+// {
+//     ngl::Vec3 gradient(0.0f, 0.0f, 0.0f);
+//     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
+//
+//     for (size_t i = 0; i < m_maxParticles; ++i)
+//     {
+//         const ngl::Vec3 displacement = ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z) - samplePoint;
+//         const float dstSq = displacement.lengthSquared();
+//
+//         if (dstSq >= radiusSq || dstSq == 0.0f)
+//             continue;
+//
+//         const float dst = std::sqrt(dstSq);
+//         const ngl::Vec3 dir = displacement / dst;  // Normalized direction vector
+//         const float slope = SmoothingKernelDerivative(m_smoothingRadius, dst);
+//         const float density = CalculateDensity(ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z));
+//
+//         // Avoid division by zero and accumulate gradient
+//         if (density > 0.0f)
+//         {
+//             gradient += -particleProperties[i] * dir * slope * m_particleMass / density;
+//         }
+//     }
+//
+//     return gradient;
+// }
 //
 // ngl::Vec3 Emitter::calculateViscosityForce(size_t _i) const
 // {
@@ -311,33 +415,66 @@ void Emitter::update(float _dt)
     }
 
 }
+
+// void Emitter::update(float _dt)
+// {
+//     // 1. Update spatial lookup structure
+//     UpdateSpatialLookup();
 //
-//  void Emitter::update(float _dt)
-//  {
-// //     if (!m_simulate)
-// //     {
-// //         // Non-physics visualization mode
-// //         for(size_t i = 0; i < m_maxParticles; ++i)
-// //         {
-// //             m_psize[i] += 0.1f;
-// //             m_psize[i] = std::clamp(m_psize[i], 0.0f, 4.0f);
-// //             m_ppos[i].m_w = m_psize[i];
-// //             m_pcolour[i] = ngl::Random::getRandomColour3();
-// //         }
-// //         return;
-// //     }
-// //
-//     if(m_simulate)
-//     {
-//         simulationStep(_dt);
+//     // 2. Parallel density calculation
+//     #pragma omp parallel for
+//     for(size_t i = 0; i < m_maxParticles; ++i) {
+//         m_densities[i] = CalculateDensity(i);
 //     }
 //
-//     // Visualization updates
-//     if(m_showDensity)
-//         visualizeDensities();
-//     else if(m_showSmoothing)
-//         visualizeSmoothing();
-//  }
+//     // 3. Calculate forces
+//     #pragma omp parallel for
+//     for(size_t i = 0; i < m_maxParticles; ++i) {
+//         if (!m_simulate) {
+//             m_psize[i] += 0.1f;
+//             m_psize[i] = std::clamp(m_psize[i], 0.0f, 4.0f);
+//             m_ppos[i].m_w = m_psize[i];
+//             m_pcolour[i] = ngl::Random::getRandomColour3();
+//             continue;
+//         }
+//
+//         ngl::Vec3 pressureForce(0.0f, 0.0f, 0.0f);
+//         ngl::Vec3 viscosityForce(0.0f, 0.0f, 0.0f);
+//         const ngl::Vec3 pos(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z);
+//         const float density_i = m_densities[i];
+//
+//         ForEachNeighbor(i, [&](size_t j) {
+//             // Pressure force
+//             ngl::Vec3 dir = ngl::Vec3(m_ppos[j].m_x, m_ppos[j].m_y, m_ppos[j].m_z) - pos;
+//             float dist = dir.length();
+//             if(dist > 0.0f) {
+//                 dir /= dist;
+//                 float slope = SmoothingKernelDerivative(m_smoothingRadius, dist);
+//                 float sharedPressure = calculateSharedPressure(density_i, m_densities[j]);
+//                 pressureForce -= dir * sharedPressure * slope * m_particleMass / m_densities[j];
+//             }
+//
+//             // Viscosity force
+//             float influence = SmoothingKernel(m_smoothingRadius, dist);
+//             viscosityForce += (m_pdir[j] - m_pdir[i]) *
+//                             (m_viscosityStrength * influence * m_particleMass / m_densities[j]);
+//         });
+//
+//         // Update particle state
+//         m_ppos[i] += m_pdir[i] * 0.5f;
+//         m_psize[i] = std::clamp(m_psize[i] + 0.1f, 0.0f, 5.0f);
+//         m_ppos[i].m_w = m_psize[i];
+//         m_pcolour[i] = ngl::Random::getRandomColour3();
+//
+//         // Apply forces
+//         ngl::Vec3 gravityForce(0.0f, -9.81f * m_particleMass, 0.0f);
+//         ngl::Vec3 totalForce = pressureForce + gravityForce + viscosityForce * _dt;
+//         m_pdir[i] += totalForce / m_particleMass / 200.0f;
+//
+//         resolveCollisions(i);
+//     }
+// }
+//
 
 
 
@@ -408,6 +545,11 @@ float Emitter::convertDensityToPressure(float _density) const
     return densityError * m_pressureMultiplier;
 }
 
+// float Emitter::convertDensityToPressure(float _density) const {
+//     const float ratio = _density / m_restDensity;
+//     return m_pressureMultiplier * (pow(ratio, 7) - 1.0f); // Tait equation
+// }
+
 float Emitter::calculateSharedPressure(float densityA, float densityB) const
 {
     float pressureA = convertDensityToPressure(densityA);
@@ -455,52 +597,74 @@ ngl::Vec3 Emitter::calculatePressureForce(size_t _particleIndex) const
     return pressureForce;
 }
 
-// void Emitter::initBoundingBoxVAO()
-// {
-//     // Match your collision bounds from resolveCollisions()
-//     const float width = 100.0f, height = 50.0f, depth = 100.0f;
-//     const float hw = width/2, hh = height/2, hd = depth/2;
-//
-//     // Define the 8 corners of the box
-//     std::vector<ngl::Vec3> vertices = {
-//         // Bottom face
-//         {-hw, 0, -hd}, {hw, 0, -hd},
-//         {hw, 0, -hd}, {hw, 0, hd},
-//         {hw, 0, hd}, {-hw, 0, hd},
-//         {-hw, 0, hd}, {-hw, 0, -hd},
-//
-//         // Top face
-//         {-hw, height, -hd}, {hw, height, -hd},
-//         {hw, height, -hd}, {hw, height, hd},
-//         {hw, height, hd}, {-hw, height, hd},
-//         {-hw, height, hd}, {-hw, height, -hd},
-//
-//         // Vertical edges
-//         {-hw, 0, -hd}, {-hw, height, -hd},
-//         {hw, 0, -hd}, {hw, height, -hd},
-//         {hw, 0, hd}, {hw, height, hd},
-//         {-hw, 0, hd}, {-hw, height, hd}
-//     };
-//
-//     // Correct VAO creation - no need for reset()
-//     m_boxVAO = ngl::vaoFactoryCast<ngl::MultiBufferVAO>(ngl::VAOFactory::createVAO(ngl::multiBufferVAO, GL_LINES));
-//
-//     m_boxVAO->bind();
-//     m_boxVAO->setNumIndices(vertices.size());
-//     m_boxVAO->setData(2, ngl::SimpleVAO::VertexData(vertices.size()*sizeof(ngl::Vec3), vertices[0].m_x));
-//     m_boxVAO->unbind();
-// }
-//
-// void Emitter::renderBoundingBox() const
-// {
-//
-//     glLineWidth(2.0f);
-//     m_boxVAO->bind();
-//     m_boxVAO->setVertexAttributePointer(2, 3, GL_FLOAT, 0, 0);
-//     m_boxVAO->draw();
-//     m_boxVAO->unbind();
-//     glLineWidth(1.0f);
-// }
+void Emitter::initBoundingBoxVAO()
+{
+    // Match your collision bounds from resolveCollisions()
+    const float width = 50.0f, height = 50.0f, depth = 50.0f;
+    const float hw = width/2, hh = height/2, hd = depth/2;
+
+    // Define the 8 corners of the box
+    std::vector<ngl::Vec3> vertices = {
+        // Bottom face
+        {-hw, 0, -hd}, {hw, 0, -hd},
+        {hw, 0, -hd}, {hw, 0, hd},
+        {hw, 0, hd}, {-hw, 0, hd},
+        {-hw, 0, hd}, {-hw, 0, -hd},
+
+        // Top face
+        {-hw, height, -hd}, {hw, height, -hd},
+        {hw, height, -hd}, {hw, height, hd},
+        {hw, height, hd}, {-hw, height, hd},
+        {-hw, height, hd}, {-hw, height, -hd},
+
+        // Vertical edges
+        {-hw, 0, -hd}, {-hw, height, -hd},
+        {hw, 0, -hd}, {hw, height, -hd},
+        {hw, 0, hd}, {hw, height, hd},
+        {-hw, 0, hd}, {-hw, height, hd}
+    };
+
+    // Create and bind VAO
+    m_boxVAO = ngl::vaoFactoryCast<ngl::MultiBufferVAO>(
+        ngl::VAOFactory::createVAO(ngl::multiBufferVAO, GL_LINES)
+    );
+    m_boxVAO->bind();
+
+    // Set the vertex data (location = 0)
+    m_boxVAO->setData(ngl::MultiBufferVAO::VertexData(
+        vertices.size()*sizeof(ngl::Vec3),
+        vertices[0].m_x
+    ));
+
+    // Set the vertex attribute pointer
+    m_boxVAO->setVertexAttributePointer(
+        0,                  // attribute location
+        3,                  // number of components
+        GL_FLOAT,           // type
+        GL_FALSE,          // normalized?
+        0,                 // stride
+        0                  // offset
+    );
+
+    // Set number of indices (vertices) to draw
+    m_boxVAO->setNumIndices(vertices.size());
+
+    m_boxVAO->unbind();
+}
+
+void Emitter::renderBoundingBox() const
+{
+    if(!m_boxVAO) return;  // Safety check
+
+    ngl::ShaderLib::use("nglColourShader");
+    ngl::ShaderLib::setUniform("Colour", 1.0f, 0.0f, 0.0f, 1.0f); // Red color
+
+    glLineWidth(2.0f);
+    m_boxVAO->bind();
+    m_boxVAO->draw();
+    m_boxVAO->unbind();
+    glLineWidth(1.0f);
+}
 
 void Emitter::initializeParticles()
 {
@@ -563,8 +727,8 @@ void Emitter::initializeParticles()
         }
     }
 
-    CalculateDensity(ngl::Vec3(0.0f, 0.0f, 0.0f));
-    CalculateProperty(ngl::Vec3(0.0f,0.0f,0.0f), m_densities);
+    //CalculateDensity(ngl::Vec3(0.0f, 0.0f, 0.0f));
+    //CalculateProperty(ngl::Vec3(0.0f,0.0f,0.0f), m_densities);
 
 
     // No leftover particles will be placed - m_maxParticles now equals exact grid count
@@ -642,7 +806,10 @@ void Emitter::render(int _width, int _height) const
     glDisable(GL_PROGRAM_POINT_SIZE);
 
 
+
     m_vao->unbind();
+
+    renderBoundingBox();
 
     //ngl::Transformation tx;
     // for(auto &p : m_particles)

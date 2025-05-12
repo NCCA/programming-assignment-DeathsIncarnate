@@ -18,6 +18,7 @@ class Emitter
     void update(float _dt);
     void render(int _width, int _height) const;
     void move(float _dx, float _dy, float _dz);
+    // float CalculateDensity(const ngl::Vec3 &samplePoint);
     float CalculateDensity(const ngl::Vec3 &samplePoint);
     float CalculateProperty(const ngl::Vec3& samplePoint,
                            const std::vector<float>& particleProperties);
@@ -95,6 +96,22 @@ class Emitter
 
     ngl::Vec3 calculateCursorForce(size_t particleIdx) const;
 
+
+    struct SpatialEntry {
+        size_t particleIndex;
+        size_t cellKey;
+    };
+
+    std::vector<SpatialEntry> m_spatialLookup;
+    std::vector<size_t> m_startIndices;
+    float m_gridCellSize;
+
+    // Spatial hashing methods
+    void UpdateSpatialLookup();
+    std::array<int, 3> PositionToCellCoord(const ngl::Vec3& point) const;
+    size_t HashCell(int cellX, int cellY, int cellZ) const;
+    void ForEachNeighbor(size_t particleIdx, std::function<void(size_t)> callback);
+    size_t GetKeyFromHash(size_t hash) const;
 
 
 

@@ -78,11 +78,6 @@ void NGLScene::paintGL()
   ngl::ShaderLib::setUniform("MVP", m_project * m_view * mouseRotation);
   m_emitter -> render(m_win.width, m_win.height);
 
-  glPointSize(5);
-  ngl::ShaderLib::use(ngl::nglColourShader);
-  ngl::ShaderLib::setUniform("MVP", m_project * m_view * mouseRotation);
-  ngl::ShaderLib::setUniform("Colour", 1.0f, 1.0f, 1.0f, 1.0f);
-  //m_emitter -> renderBoundingBox();
   //m_emitter -> debug();
 
   ngl::ShaderLib::use(ngl::nglColourShader);
