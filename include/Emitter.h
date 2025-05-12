@@ -19,7 +19,7 @@ class Emitter
     void render(int _width, int _height) const;
     void move(float _dx, float _dy, float _dz);
     // float CalculateDensity(const ngl::Vec3 &samplePoint);
-    float CalculateDensity(const ngl::Vec3 &samplePoint);
+    float CalculateDensity(const ngl::Vec3& samplePoint);
     float CalculateProperty(const ngl::Vec3& samplePoint,
                            const std::vector<float>& particleProperties);
     ngl::Vec3 CalculatePropertyGradient(const ngl::Vec3& samplePoint,
@@ -29,8 +29,6 @@ class Emitter
     void calculateAllDensities();
     void visualizeDensities();
     void visualizeSmoothing();
-    void toggleDensityVisualization() { m_showDensity = !m_showDensity; }
-    void toggleSmoothingVisualization() { m_showSmoothing = !m_showSmoothing; }
     ngl::Vec3 calculatePressureForce(size_t _particleIndex) const;
     float convertDensityToPressure(float _density) const;
     float calculateSharedPressure(float densityA, float densityB) const;
@@ -40,6 +38,11 @@ class Emitter
 
     void setCursorPos(const ngl::Vec3 &_pos, float _radius, float _strength);
     void toggleCursorInteraction() { m_cursorInteraction = !m_cursorInteraction; }
+
+    float m_width = 50.0f;
+    float m_height = 50.0f;
+    float m_depth = 50.0f;
+
 
 
 
@@ -70,21 +73,22 @@ class Emitter
     std::vector<float> m_ppressure;    // Pressures
 
     // SPH parameters
-    float m_smoothingRadius = 100.0f;   // Adjust based on scale
+    float m_smoothingRadius = 3.0f;   // Adjust based on scale
     float m_particleMass = 1.0f;      // Typically 1.0 for simplicity
     float m_restDensity = 1000.0f;    // Water-like density
     std::vector<float> m_densities;
-    bool m_showDensity = false;
-    bool m_showSmoothing = false;
     float m_maxDensity = 0.0f;
     // Add these to your Emitter.h in the private section:
     float m_targetDensity = 1000.0f; // Typical water density kg/m³
     float m_pressureMultiplier = 1.0f; // Stiffness constant
     float m_viscosityStrength = 0.1f;
     float m_damping = 0.01f;
+    const float m_particleSpacing = 1.5f;
+
+
 
     std::unique_ptr<ngl::MultiBufferVAO> m_boxVAO;
-    void initBoundingBoxVAO();
+    void initBoundingBoxVAO(float width, float height, float depth);
 
     // float m_pressureStiffness = 100.0f;   // Adjusts fluid compressibility
     // float m_viscosity = 0.1f;            // For damping oscillations
@@ -114,6 +118,23 @@ class Emitter
     size_t GetKeyFromHash(size_t hash) const;
 
 
+
+    //         // Physical properties
+    //         float particleMass = 0.02f;
+    //         float restDensity = 1000.0f;
+    //         float smoothingRadius = 0.1f;
+    //         float particleSpacing = 0.05f;
+    //
+    //         // Force coefficients
+    //         float pressureMultiplier = 100.0f;
+    //         float viscosityStrength = 0.1f;
+    //         float surfaceTension = 0.072f;
+    //
+    //         // Simulation control
+    //         float timeStep = 0.001f;
+    //         int maxIterations = 5;
+    //         float boundaryDamping = 0.5f;
+    //     };
 
 
 };
