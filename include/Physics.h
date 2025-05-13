@@ -16,14 +16,14 @@
 class Physics
 {
 public:
-    Physics(const size_t& m_maxParticles, std::vector<ngl::Vec4>& m_ppos, std::vector<ngl::Vec3>& m_pdir);
+    Physics(std::vector<ngl::Vec4>& m_ppos, std::vector<ngl::Vec3>& m_pdir);
     ~Physics() = default; // Destructor
-    float CalculateDensity(const ngl::Vec3& samplePoint);
-    ngl::Vec3 calculateViscosityForce(size_t _particleIndex) const;
-    void calculateAllDensities();
+    float CalculateDensity(const ngl::Vec3& samplePoint, size_t m_maxParticles);
+    ngl::Vec3 calculateViscosityForce(size_t _particleIndex, size_t m_maxParticles) const;
+    void calculateAllDensities(size_t m_maxParticles);
     float convertDensityToPressure(float _density) const;
     float calculateSharedPressure(float densityA, float densityB) const;
-    ngl::Vec3 calculatePressureForce(size_t _particleIndex) const;
+    ngl::Vec3 calculatePressureForce(size_t _particleIndex, size_t m_maxParticles) const;
 
     float m_smoothingRadius = 3.0f;   // Adjust based on scale
     float m_particleMass = 1.0f;      // Typically 1.0 for simplicity

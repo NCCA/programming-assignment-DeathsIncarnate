@@ -40,7 +40,7 @@ class Emitter
 
     private:
     BoundingBox m_boundingBox;
-    Physics m_physics;
+    std::unique_ptr<Physics> m_physics;
 
     //std::vector<Particle> m_particles;
     std::vector<ngl::Vec4> m_ppos;

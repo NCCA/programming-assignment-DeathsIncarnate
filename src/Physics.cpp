@@ -11,8 +11,8 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/Transformation.h>
 
-Physics::Physics(const size_t& m_maxParticles, std::vector<ngl::Vec4>& m_ppos, std::vector<ngl::Vec3>& m_pdir)
-  : m_maxParticles(m_maxParticles), m_ppos(m_ppos), m_pdir(m_pdir)
+Physics::Physics(std::vector<ngl::Vec4>& m_ppos, std::vector<ngl::Vec3>& m_pdir)
+  :m_ppos(m_ppos), m_pdir(m_pdir)
 {
 }
 
@@ -60,7 +60,7 @@ static float SmoothingKernelDerivative(float radius, float dst)
     }
 }
 
-float Physics::CalculateDensity(const ngl::Vec3& samplePoint)
+float Physics::CalculateDensity(const ngl::Vec3& samplePoint, size_t m_maxParticles)
 {
     float density = 0.0f;
     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
@@ -81,7 +81,7 @@ float Physics::CalculateDensity(const ngl::Vec3& samplePoint)
     return density;
 }
 
-ngl::Vec3 Physics::calculateViscosityForce(size_t _particleIndex) const
+ngl::Vec3 Physics::calculateViscosityForce(size_t _particleIndex, size_t m_maxParticles) const
 {
     ngl::Vec3 viscosityForce(0.0f, 0.0f, 0.0f);
     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
@@ -120,7 +120,7 @@ ngl::Vec3 Physics::calculateViscosityForce(size_t _particleIndex) const
     return viscosityForce;
 }
 
-void Physics::calculateAllDensities()
+void Physics::calculateAllDensities(size_t m_maxParticles)
 {
     m_maxDensity = 0.0f;
     m_densities.resize(m_maxParticles);
@@ -128,7 +128,7 @@ void Physics::calculateAllDensities()
     #pragma omp parallel for reduction(max:m_maxDensity)
     for(size_t i = 0; i < m_maxParticles; ++i)
     {
-        m_densities[i] = CalculateDensity(ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z));
+        m_densities[i] = CalculateDensity(ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z), m_maxParticles);
         if(m_densities[i] > m_maxDensity)
         {
             m_maxDensity = m_densities[i];
@@ -154,7 +154,7 @@ float Physics::calculateSharedPressure(float densityA, float densityB) const
     return (pressureA + pressureB) / 2.0f;
 }
 
-ngl::Vec3 Physics::calculatePressureForce(size_t _particleIndex) const
+ngl::Vec3 Physics::calculatePressureForce(size_t _particleIndex, size_t m_maxParticles) const
 {
     ngl::Vec3 pressureForce(0.0f, 0.0f, 0.0f);
     const float radiusSq = m_smoothingRadius * m_smoothingRadius;

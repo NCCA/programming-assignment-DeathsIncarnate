@@ -106,12 +106,12 @@ void BoundingBox::resolveCollisions(size_t _i, std::vector<ngl::Vec4>& m_ppos, s
          // m_pdir[_i].m_y = -std::abs(m_pdir[_i].m_y) * collisionDamping;
          m_pdir[_i].m_y *= -collisionDamping;  // Reverse velocity
 
-         // Small upward push to avoid getting stuck
-         if (std::abs(m_pdir[_i].m_y) < 0.1f)
-         {
-             m_pdir[_i].m_y += 0.5f;
-             // m_pdir[_i].m_y = 1.0f; // minimum bounce impulse
-         }
+     //     // Small upward push to avoid getting stuck
+     //     if (std::abs(m_pdir[_i].m_y) < 0.1f)
+     //     {
+     //         m_pdir[_i].m_y += 0.5f;
+     //         // m_pdir[_i].m_y = 1.0f; // minimum bounce impulse
+     //     }
      }
 
 
