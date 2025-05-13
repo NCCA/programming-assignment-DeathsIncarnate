@@ -2,20 +2,18 @@
 #include <iostream>
 #include <ngl/Random.h>
 #include <algorithm>
-#include <fstream>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/VAOFactory.h>
-#include <ngl/Mat4.h>
 #include <ngl/ShaderLib.h>
 #include <ngl/Transformation.h>
 #include <ngl/MultiBufferVAO.h>
-#include <ngl/Text.h>
+#include "Physics.h"
 
 
 
 
 Emitter::Emitter(size_t _num, size_t _maxAlive, size_t _numPerFrame, ngl::Vec3 _pos):
-m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos{_pos}
+m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos{_pos}, m_boundingBox(), m_physics(m_maxParticles, m_ppos, m_pdir)
 {
     m_maxParticles = _num;
     m_ppos.resize(m_maxParticles);
@@ -24,8 +22,9 @@ m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos
     m_psize.resize(m_maxParticles);
     m_plife.resize(m_maxParticles);
     m_pstate.resize(m_maxParticles);
-    m_densities.resize(m_maxParticles);
-    m_maxDensity = 0.0f;
+    m_physics.m_densities.resize(m_maxParticles);
+    m_physics.m_maxDensity = 0.0f;
+
 
     // for (size_t i = 0; i < m_maxParticles; ++i)
     // {
@@ -36,11 +35,11 @@ m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos
     std::fill(m_startIndices.begin(), m_startIndices.end(), std::numeric_limits<size_t>::max());
 
     // Initialize SPH parameters
-    m_targetDensity = m_restDensity;
+    m_physics.m_targetDensity = m_physics.m_restDensity;
     //m_smoothingRadius = 2.0f * m_particleSpacing; // Typically 2x particle spacing
 
     // Initialize spatial hashing
-    m_gridCellSize = m_smoothingRadius * 2.0f;
+    m_gridCellSize = m_physics.m_smoothingRadius * 2.0f;
     m_spatialLookup.resize(m_maxParticles);
     m_startIndices.resize(m_maxParticles, std::numeric_limits<size_t>::max());
 
@@ -54,7 +53,7 @@ m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos
     m_vao->setData(ngl::MultiBufferVAO::VertexData(0,0)); // index 2 Densities
     m_vao->unbind();
 
-    initBoundingBoxVAO(m_width, m_height, m_depth);
+    m_boundingBox.initBoundingBoxVAO();
 }
 
 // void Emitter::UpdateSpatialLookup()
@@ -154,71 +153,71 @@ size_t Emitter::size() const
 }
 
 
-// Standard cubic spline kernel (Müller et al.)
-// Optimized cubic spline kernel for 3D SPH
-static float SmoothingKernel(float radius, float dst)
-{
-    if (dst >= radius) return 0.0f;
-
-    const float h = radius;
-    const float h3 = h * h * h;
-    const float q = dst / h;
-
-    // Precomputed normalization constant
-    const float norm = 8.0f / (M_PI * h3);
-
-    if (q <= 0.5f) {
-        const float q2 = q * q;
-        const float q3 = q2 * q;
-        return norm * (1.0f - 6.0f * q2 + 6.0f * q3);
-    }
-    else {
-        const float term = 2.0f - q;
-        return norm * (0.5f * term * term * term);
-    }
-}
-
-// Optimized derivative of cubic spline kernel
-static float SmoothingKernelDerivative(float radius, float dst)
-{
-    if (dst >= radius || dst == 0.0f) return 0.0f;
-
-    const float h = radius;
-    const float h4 = h * h * h * h;
-    const float q = dst / h;
-
-    // Precomputed normalization constant
-    const float norm = 8.0f / (M_PI * h4);
-
-    if (q <= 0.5f) {
-        return norm * (3.0f * q - 4.5f * q * q);
-    }
-    else {
-        const float term = 2.0f - q;
-        return norm * (-1.5f * term * term);
-    }
-}
-
-float Emitter::CalculateDensity(const ngl::Vec3& samplePoint)
-{
-    float density = 0.0f;
-    const float radiusSq = m_smoothingRadius * m_smoothingRadius;
-
-    for (size_t i = 0; i < m_maxParticles; ++i)
-    {
-        const float dx = m_ppos[i].m_x - samplePoint.m_x;
-        const float dy = m_ppos[i].m_y - samplePoint.m_y;
-        const float dz = m_ppos[i].m_z - samplePoint.m_z;
-        const float dstSq = dx*dx + dy*dy + dz*dz;
-
-        if (dstSq >= radiusSq) continue;
-
-        const float dst = std::sqrt(dstSq);
-        density += m_particleMass * SmoothingKernel(m_smoothingRadius, dst);
-    }
-    //std::cout <<"Density" << density << "\n";
-    return density;
-}
+// // Standard cubic spline kernel (Müller et al.)
+// // Optimized cubic spline kernel for 3D SPH
+// static float SmoothingKernel(float radius, float dst)
+// {
+//     if (dst >= radius) return 0.0f;
+//
+//     const float h = radius;
+//     const float h3 = h * h * h;
+//     const float q = dst / h;
+//
+//     // Precomputed normalization constant
+//     const float norm = 8.0f / (M_PI * h3);
+//
+//     if (q <= 0.5f) {
+//         const float q2 = q * q;
+//         const float q3 = q2 * q;
+//         return norm * (1.0f - 6.0f * q2 + 6.0f * q3);
+//     }
+//     else {
+//         const float term = 2.0f - q;
+//         return norm * (0.5f * term * term * term);
+//     }
+// }
+//
+// // Optimized derivative of cubic spline kernel
+// static float SmoothingKernelDerivative(float radius, float dst)
+// {
+//     if (dst >= radius || dst == 0.0f) return 0.0f;
+//
+//     const float h = radius;
+//     const float h4 = h * h * h * h;
+//     const float q = dst / h;
+//
+//     // Precomputed normalization constant
+//     const float norm = 8.0f / (M_PI * h4);
+//
+//     if (q <= 0.5f) {
+//         return norm * (3.0f * q - 4.5f * q * q);
+//     }
+//     else {
+//         const float term = 2.0f - q;
+//         return norm * (-1.5f * term * term);
+//     }
+// }
+//
+// float Emitter::CalculateDensity(const ngl::Vec3& samplePoint)
+// {
+//     float density = 0.0f;
+//     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
+//
+//     for (size_t i = 0; i < m_maxParticles; ++i)
+//     {
+//         const float dx = m_ppos[i].m_x - samplePoint.m_x;
+//         const float dy = m_ppos[i].m_y - samplePoint.m_y;
+//         const float dz = m_ppos[i].m_z - samplePoint.m_z;
+//         const float dstSq = dx*dx + dy*dy + dz*dz;
+//
+//         if (dstSq >= radiusSq) continue;
+//
+//         const float dst = std::sqrt(dstSq);
+//         density += m_particleMass * SmoothingKernel(m_smoothingRadius, dst);
+//     }
+//     //std::cout <<"Density" << density << "\n";
+//     return density;
+// }
 
 // float Emitter::CalculateDensity(size_t particleIdx)
 // {
@@ -252,133 +251,50 @@ float Emitter::CalculateDensity(const ngl::Vec3& samplePoint)
 //     return std::max(density, 0.0001f);
 // }
 
-// float Emitter::CalculateProperty(const ngl::Vec3& samplePoint,
-//                                const std::vector<float>& particleProperties)
-// {
-//     float property = 0.0f;
-//     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
-//
-//     for (int i = 0; i < m_maxParticles; ++i)
-//     {
-//         const float dx = m_ppos[i].m_x - samplePoint.m_x;
-//         const float dy = m_ppos[i].m_y - samplePoint.m_y;
-//         const float dz = m_ppos[i].m_z - samplePoint.m_z;
-//         const float dstSq = dx*dx + dy*dy + dz*dz;
-//
-//         if (dstSq >= radiusSq) continue;
-//
-//         const float dst = std::sqrt(dstSq);
-//         const float influence = SmoothingKernel(m_smoothingRadius, dst);
-//         const ngl::Vec3 position3D(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z);
-//         const float density = CalculateDensity(position3D);
-//
-//         // Avoid division by zero
-//         if (density > 0.0f) {
-//             property += particleProperties[i] * m_particleMass * influence / density;
-//         }
-//     }
-//
-//     return property;
-// }
 
-// ngl::Vec3 Emitter::CalculatePropertyGradient(const ngl::Vec3& samplePoint,
-//                                            const std::vector<float>& particleProperties)
-// {
-//     ngl::Vec3 gradient(0.0f, 0.0f, 0.0f);
-//     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
-//
-//     for (size_t i = 0; i < m_maxParticles; ++i)
-//     {
-//         const ngl::Vec3 displacement = ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z) - samplePoint;
-//         const float dstSq = displacement.lengthSquared();
-//
-//         if (dstSq >= radiusSq || dstSq == 0.0f)
-//             continue;
-//
-//         const float dst = std::sqrt(dstSq);
-//         const ngl::Vec3 dir = displacement / dst;  // Normalized direction vector
-//         const float slope = SmoothingKernelDerivative(m_smoothingRadius, dst);
-//         const float density = CalculateDensity(ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z));
-//
-//         // Avoid division by zero and accumulate gradient
-//         if (density > 0.0f)
-//         {
-//             gradient += -particleProperties[i] * dir * slope * m_particleMass / density;
-//         }
-//     }
-//
-//     return gradient;
-// }
-//
-// ngl::Vec3 Emitter::calculateViscosityForce(size_t _i) const
+// ngl::Vec3 Emitter::calculateViscosityForce(size_t _particleIndex) const
 // {
 //     ngl::Vec3 viscosityForce(0.0f, 0.0f, 0.0f);
 //     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
 //
+//     const ngl::Vec3 currentPos(m_ppos[_particleIndex].m_x,
+//                           m_ppos[_particleIndex].m_y,
+//                           m_ppos[_particleIndex].m_z);
 //
-//     for (size_t j = 0; j < m_maxParticles; ++j)
+//     for(size_t otherIndex = 0; otherIndex < m_maxParticles; ++otherIndex)
 //     {
-//         if (_i == j) continue;
+//         if(_particleIndex == otherIndex) continue;
 //
-//         ngl::Vec3 offset = ngl::Vec3(m_ppos[j].m_x, m_ppos[j].m_y, m_ppos[j].m_z) -
-//                    ngl::Vec3(m_ppos[_i].m_x, m_ppos[_i].m_y, m_ppos[_i].m_z);
+//         const ngl::Vec3 otherPos(m_ppos[otherIndex].m_x,
+//                                 m_ppos[otherIndex].m_y,
+//                                 m_ppos[otherIndex].m_z);
 //
-//         float dstSq = offset.lengthSquared();
-//         if (dstSq >= radiusSq || dstSq == 0.0f) continue;
+//         const ngl::Vec3 offset = otherPos - currentPos;
+//         const float dstSq = offset.lengthSquared();
 //
-//         float dst = std::sqrt(dstSq);
-//         float influence = SmoothingKernel(m_smoothingRadius, dst);
+//         if(dstSq >= radiusSq || dstSq == 0.0f) continue;
 //
+//         const float dst = std::sqrt(dstSq);
+//         const float influence = SmoothingKernel(m_smoothingRadius, dst);
 //
-//         viscosityForce += (m_pdir[j] - m_pdir[_i]) * (m_viscosityStrength * influence * m_particleMass / m_densities[j]);
+//         // Velocity difference
+//         const ngl::Vec3 velocityDiff = m_pdir[otherIndex] - m_pdir[_particleIndex];
+//
+//         // The viscous force that THIS particle exerts on THE OTHER particle
+//         const ngl::Vec3 force = velocityDiff * (m_viscosityStrength * influence * m_particleMass / m_densities[otherIndex]);
+//
+//         // Newton's Third Law application:
+//         viscosityForce -= force;  // Our particle gets the opposite force
+//         // Note: The other particle will get +force when its turn comes
 //     }
 //
 //     return viscosityForce;
 // }
 
-ngl::Vec3 Emitter::calculateViscosityForce(size_t _particleIndex) const
-{
-    ngl::Vec3 viscosityForce(0.0f, 0.0f, 0.0f);
-    const float radiusSq = m_smoothingRadius * m_smoothingRadius;
-
-    const ngl::Vec3 currentPos(m_ppos[_particleIndex].m_x,
-                          m_ppos[_particleIndex].m_y,
-                          m_ppos[_particleIndex].m_z);
-
-    for(size_t otherIndex = 0; otherIndex < m_maxParticles; ++otherIndex)
-    {
-        if(_particleIndex == otherIndex) continue;
-
-        const ngl::Vec3 otherPos(m_ppos[otherIndex].m_x,
-                                m_ppos[otherIndex].m_y,
-                                m_ppos[otherIndex].m_z);
-
-        const ngl::Vec3 offset = otherPos - currentPos;
-        const float dstSq = offset.lengthSquared();
-
-        if(dstSq >= radiusSq || dstSq == 0.0f) continue;
-
-        const float dst = std::sqrt(dstSq);
-        const float influence = SmoothingKernel(m_smoothingRadius, dst);
-
-        // Velocity difference
-        const ngl::Vec3 velocityDiff = m_pdir[otherIndex] - m_pdir[_particleIndex];
-
-        // The viscous force that THIS particle exerts on THE OTHER particle
-        const ngl::Vec3 force = velocityDiff * (m_viscosityStrength * influence * m_particleMass / m_densities[otherIndex]);
-
-        // Newton's Third Law application:
-        viscosityForce -= force;  // Our particle gets the opposite force
-        // Note: The other particle will get +force when its turn comes
-    }
-
-    return viscosityForce;
-}
-
 void Emitter::update(float _dt)
 {
     // Calculate densities first
-    calculateAllDensities();
+    m_physics.calculateAllDensities();
 
     // else
     // {
@@ -391,9 +307,7 @@ void Emitter::update(float _dt)
     // }
 
 
-    const ngl::Vec3 gravity(0.0f, -9.81f, 0.0f);
 
-    auto numAlive = std::count_if(std::begin(m_pstate), std::end(m_pstate), [](auto p){return p == ParticleState::Active;});
 
     // if (numAlive < m_maxAlive)
     // {
@@ -415,7 +329,7 @@ void Emitter::update(float _dt)
         }
         else
         {
-            ngl::Vec3 emitDir(0.0f, 2.0f, 0.0f);
+            // ngl::Vec3 emitDir(0.0f, 2.0f, 0.0f);
             //m_pdir[i] += gravity * _dt * 0.5f;
             m_ppos[i] += m_pdir[i] * 0.5f;
             m_psize[i] += 0.1f;
@@ -425,13 +339,13 @@ void Emitter::update(float _dt)
             //ngl::Vec3 cursorForce = calculateCursorForce(i);
 
             m_pcolour[i] = ngl::Random::getRandomColour3();
-            ngl::Vec3 pressureForce = calculatePressureForce(i); /// 10.0f;
-            ngl::Vec3 viscosityForce = calculateViscosityForce(i); /// 10.0f;
-            ngl::Vec3 gravityForce(0.0f, -9.81f * m_particleMass, 0.0f);
+            ngl::Vec3 pressureForce = m_physics.calculatePressureForce(i); /// 10.0f;
+            ngl::Vec3 viscosityForce = m_physics.calculateViscosityForce(i); /// 10.0f;
+            ngl::Vec3 gravityForce(0.0f, -9.81f * m_physics.m_particleMass, 0.0f);
             ngl::Vec3 totalForce = pressureForce + gravityForce + viscosityForce * _dt; //+ (cursorForce*2000000) * _dt;
-            m_pdir[i] = totalForce / m_particleMass / 200.0f; /// 10000.0f;
+            m_pdir[i] = totalForce / m_physics.m_particleMass / 20.0f; /// 10000.0f;
 
-            resolveCollisions(i);
+            m_boundingBox.resolveCollisions(i, m_ppos, m_pdir, m_psize);
 
         }
         // if (--m_plife[i] <= 0 || m_ppos[i].m_y < 0.0f)
@@ -508,194 +422,80 @@ void Emitter::update(float _dt)
 // }
 
 
-
-
-void Emitter::resolveCollisions(size_t _i)
-{
-    ngl::Vec3 boundSize(m_width, m_height, m_depth); // Proper bounding box
-    float collisionDamping = 0.7f; // Controls bounce effect
-    ngl::Vec3 halfBoundSize = boundSize * 0.5f - ngl::Vec3(1.0f, 1.0f, 1.0f) * m_psize[_i];
-
-    // X-axis collision
-    if (std::abs(m_ppos[_i].m_x) > halfBoundSize.m_x)
-    {
-        m_ppos[_i].m_x = halfBoundSize.m_x * (m_ppos[_i].m_x > 0 ? 1.0f : -1.0f);
-        m_pdir[_i].m_x *= -collisionDamping;
-    }
-
-    // Floor collision at y = 0
-     if (m_ppos[_i].m_y <= 0.0f)
-     {
-         m_ppos[_i].m_y = 0.0f;  // Stick to the floor
-         // // Reverse velocity and apply damping
-         // m_pdir[_i].m_y = -std::abs(m_pdir[_i].m_y) * collisionDamping;
-         m_pdir[_i].m_y *= -collisionDamping;  // Reverse velocity
-
-         // Small upward push to avoid getting stuck
-         if (std::abs(m_pdir[_i].m_y) < 0.1f)
-         {
-             m_pdir[_i].m_y += 0.5f;
-             // m_pdir[_i].m_y = 1.0f; // minimum bounce impulse
-         }
-     }
-
-
-    // // Ceiling collision at upper bound
-    // if (m_ppos[_i].m_y > halfBoundSize.m_y)
-    // {
-    //     m_ppos[_i].m_y = halfBoundSize.m_y;
-    //     m_pdir[_i].m_y *= -collisionDamping;
-    // }
-
-    // Z-axis collision
-    if (std::abs(m_ppos[_i].m_z) > halfBoundSize.m_z)
-    {
-        m_ppos[_i].m_z = halfBoundSize.m_z * (m_ppos[_i].m_z > 0 ? 1.0f : -1.0f);
-        m_pdir[_i].m_z *= -collisionDamping;
-    }
-}
-
-void Emitter::calculateAllDensities()
-{
-    m_maxDensity = 0.0f;
-    m_densities.resize(m_maxParticles);
-
-    #pragma omp parallel for reduction(max:m_maxDensity)
-    for(size_t i = 0; i < m_maxParticles; ++i)
-    {
-        m_densities[i] = CalculateDensity(ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z));
-        if(m_densities[i] > m_maxDensity)
-        {
-            m_maxDensity = m_densities[i];
-        }
-    }
-}
-
-float Emitter::convertDensityToPressure(float _density) const
-{
-    const float densityError = _density - m_targetDensity;
-    return densityError * m_pressureMultiplier;
-}
-
-// float Emitter::convertDensityToPressure(float _density) const {
-//     const float ratio = _density / m_restDensity;
-//     return m_pressureMultiplier * (pow(ratio, 7) - 1.0f); // Tait equation
+// void Emitter::calculateAllDensities()
+// {
+//     m_maxDensity = 0.0f;
+//     m_densities.resize(m_maxParticles);
+//
+//     #pragma omp parallel for reduction(max:m_maxDensity)
+//     for(size_t i = 0; i < m_maxParticles; ++i)
+//     {
+//         m_densities[i] = CalculateDensity(ngl::Vec3(m_ppos[i].m_x, m_ppos[i].m_y, m_ppos[i].m_z));
+//         if(m_densities[i] > m_maxDensity)
+//         {
+//             m_maxDensity = m_densities[i];
+//         }
+//     }
+// }
+//
+// float Emitter::convertDensityToPressure(float _density) const
+// {
+//     const float densityError = _density - m_targetDensity;
+//     return densityError * m_pressureMultiplier;
+// }
+//
+// // float Emitter::convertDensityToPressure(float _density) const {
+// //     const float ratio = _density / m_restDensity;
+// //     return m_pressureMultiplier * (pow(ratio, 7) - 1.0f); // Tait equation
+// // }
+//
+// float Emitter::calculateSharedPressure(float densityA, float densityB) const
+// {
+//     float pressureA = convertDensityToPressure(densityA);
+//     float pressureB = convertDensityToPressure(densityB);
+//     return (pressureA + pressureB) / 2.0f;
+// }
+//
+// ngl::Vec3 Emitter::calculatePressureForce(size_t _particleIndex) const
+// {
+//     ngl::Vec3 pressureForce(0.0f, 0.0f, 0.0f);
+//     const float radiusSq = m_smoothingRadius * m_smoothingRadius;
+//
+//     // Convert current particle position to Vec3
+//     const ngl::Vec3 currentPos(m_ppos[_particleIndex].m_x,
+//                               m_ppos[_particleIndex].m_y,
+//                               m_ppos[_particleIndex].m_z);
+//
+//     for(size_t otherIndex = 0; otherIndex < m_maxParticles; ++otherIndex)
+//     {
+//         if(_particleIndex == otherIndex) continue;
+//
+//         // Convert other particle position to Vec3
+//         const ngl::Vec3 otherPos(m_ppos[otherIndex].m_x,
+//                                 m_ppos[otherIndex].m_y,
+//                                 m_ppos[otherIndex].m_z);
+//
+//         const ngl::Vec3 offset = otherPos - currentPos;
+//         const float dstSq = offset.lengthSquared();
+//
+//         if(dstSq >= radiusSq || dstSq == 0.0f) continue;
+//
+//         const float dst = std::sqrt(dstSq);
+//         const ngl::Vec3 dir = offset / dst;
+//         const float slope = SmoothingKernelDerivative(m_smoothingRadius, dst);
+//         const float sharedPressure = calculateSharedPressure(m_densities[_particleIndex], m_densities[otherIndex]);
+//
+//         //The force that THIS particle exerts on THE OTHER particle
+//         const ngl::Vec3 force = sharedPressure * dir * slope * m_particleMass / m_densities[otherIndex];
+//
+//         // Newton's Third Law application:
+//         pressureForce -= force;  // Our particle gets the opposite force
+//         // Note: The other particle will get +force when its turn comes in the simulation loop
+//     }
+//
+//     return pressureForce;
 // }
 
-float Emitter::calculateSharedPressure(float densityA, float densityB) const
-{
-    float pressureA = convertDensityToPressure(densityA);
-    float pressureB = convertDensityToPressure(densityB);
-    return (pressureA + pressureB) / 2.0f;
-}
-
-ngl::Vec3 Emitter::calculatePressureForce(size_t _particleIndex) const
-{
-    ngl::Vec3 pressureForce(0.0f, 0.0f, 0.0f);
-    const float radiusSq = m_smoothingRadius * m_smoothingRadius;
-
-    // Convert current particle position to Vec3
-    const ngl::Vec3 currentPos(m_ppos[_particleIndex].m_x,
-                              m_ppos[_particleIndex].m_y,
-                              m_ppos[_particleIndex].m_z);
-
-    for(size_t otherIndex = 0; otherIndex < m_maxParticles; ++otherIndex)
-    {
-        if(_particleIndex == otherIndex) continue;
-
-        // Convert other particle position to Vec3
-        const ngl::Vec3 otherPos(m_ppos[otherIndex].m_x,
-                                m_ppos[otherIndex].m_y,
-                                m_ppos[otherIndex].m_z);
-
-        const ngl::Vec3 offset = otherPos - currentPos;
-        const float dstSq = offset.lengthSquared();
-
-        if(dstSq >= radiusSq || dstSq == 0.0f) continue;
-
-        const float dst = std::sqrt(dstSq);
-        const ngl::Vec3 dir = offset / dst;
-        const float slope = SmoothingKernelDerivative(m_smoothingRadius, dst);
-        const float sharedPressure = calculateSharedPressure(m_densities[_particleIndex], m_densities[otherIndex]);
-
-        //The force that THIS particle exerts on THE OTHER particle
-        const ngl::Vec3 force = sharedPressure * dir * slope * m_particleMass / m_densities[otherIndex];
-
-        // Newton's Third Law application:
-        pressureForce -= force;  // Our particle gets the opposite force
-        // Note: The other particle will get +force when its turn comes in the simulation loop
-    }
-
-    return pressureForce;
-}
-
-void Emitter::initBoundingBoxVAO(float width, float height, float depth)
-{
-    // Match your collision bounds from resolveCollisions()
-    const float hw = width/2, hh = height/2, hd = depth/2;
-
-    // Define the 8 corners of the box
-    std::vector<ngl::Vec3> vertices = {
-        // Bottom face
-        {-hw, 0, -hd}, {hw, 0, -hd},
-        {hw, 0, -hd}, {hw, 0, hd},
-        {hw, 0, hd}, {-hw, 0, hd},
-        {-hw, 0, hd}, {-hw, 0, -hd},
-
-        // Top face
-        {-hw, height, -hd}, {hw, height, -hd},
-        {hw, height, -hd}, {hw, height, hd},
-        {hw, height, hd}, {-hw, height, hd},
-        {-hw, height, hd}, {-hw, height, -hd},
-
-        // Vertical edges
-        {-hw, 0, -hd}, {-hw, height, -hd},
-        {hw, 0, -hd}, {hw, height, -hd},
-        {hw, 0, hd}, {hw, height, hd},
-        {-hw, 0, hd}, {-hw, height, hd}
-    };
-
-    // Create and bind VAO
-    m_boxVAO = ngl::vaoFactoryCast<ngl::MultiBufferVAO>(
-        ngl::VAOFactory::createVAO(ngl::multiBufferVAO, GL_LINES)
-    );
-    m_boxVAO->bind();
-
-    // Set the vertex data (location = 0)
-    m_boxVAO->setData(ngl::MultiBufferVAO::VertexData(
-        vertices.size()*sizeof(ngl::Vec3),
-        vertices[0].m_x
-    ));
-
-    // Set the vertex attribute pointer
-    m_boxVAO->setVertexAttributePointer(
-        0,                  // attribute location
-        3,                  // number of components
-        GL_FLOAT,           // type
-        GL_FALSE,          // normalized?
-        0,                 // stride
-        0                  // offset
-    );
-
-    // Set number of indices (vertices) to draw
-    m_boxVAO->setNumIndices(vertices.size());
-
-    m_boxVAO->unbind();
-}
-
-void Emitter::renderBoundingBox() const
-{
-    if(!m_boxVAO) return;  // Safety check
-
-    ngl::ShaderLib::use("nglColourShader");
-    ngl::ShaderLib::setUniform("Colour", 1.0f, 0.0f, 0.0f, 1.0f); // Red color
-
-    glLineWidth(2.0f);
-    m_boxVAO->bind();
-    m_boxVAO->draw();
-    m_boxVAO->unbind();
-    glLineWidth(1.0f);
-}
 
 void Emitter::initializeParticles()
 {
@@ -703,7 +503,7 @@ void Emitter::initializeParticles()
     const float jitterStrength = 0.0f;
     const float initialLife = 100.0f;
     const float baseVelocityY = 2.0f;
-    const float particleSpacing = m_particleSpacing; // Adjusts density
+    const float particleSpacing = m_physics.m_particleSpacing; // Adjusts density
 
 
     // Calculate particles per axis based on spacing and size
@@ -758,11 +558,6 @@ void Emitter::initializeParticles()
         }
     }
 
-    //CalculateDensity(ngl::Vec3(0.0f, 0.0f, 0.0f));
-    //CalculateProperty(ngl::Vec3(0.0f,0.0f,0.0f), m_densities);
-
-
-    // No leftover particles will be placed - m_maxParticles now equals exact grid count
 }
 //
 // void Emitter::setCursorPos(const ngl::Vec3 &_pos, float _radius, float _strength)
@@ -822,11 +617,11 @@ void Emitter::render(int _width, int _height) const
     m_vao->setVertexAttributePointer(1, 3, GL_FLOAT, 0, 0);
 
     // Density data (location = 2) - Corrected version
-    if(!m_densities.empty())
+    if(!m_physics.m_densities.empty())
     {
         m_vao->setData(2, ngl::MultiBufferVAO::VertexData(
-            m_densities.size() * sizeof(float),
-            m_densities[0]  // Pass first element by reference
+            m_physics.m_densities.size() * sizeof(float),
+            m_physics.m_densities[0]  // Pass first element by reference
         ));
         m_vao->setVertexAttributePointer(2, 1, GL_FLOAT, 0, 0);
     }
@@ -840,26 +635,17 @@ void Emitter::render(int _width, int _height) const
 
     m_vao->unbind();
 
-    renderBoundingBox();
+    m_boundingBox.renderBoundingBox();
 
-    //ngl::Transformation tx;
-    // for(auto &p : m_particles)
-    // {
-    //     tx.setPosition(p.pos);
-    //     //tx.setScale(p.size, p.size, p.size);
-    //     ngl::ShaderLib::setUniform("MVP", project * view * tx.getMatrix());
-    //     ngl::ShaderLib::setUniform("Colour", p.colour.m_r,  p.colour.m_g, p.colour.m_b, 1.0f);
-    //     ngl::VAOPrimitives::draw("sphere", GL_POINTS);
-    // }
 }
 
 
-void Emitter::move(float _dx, float _dy, float _dz)
-{
-    m_pos.m_x += _dx;
-    m_pos.m_y += _dy;
-    m_pos.m_z += _dz;
-}
+// void Emitter::move(float _dx, float _dy, float _dz)
+// {
+//     m_pos.m_x += _dx;
+//     m_pos.m_y += _dy;
+//     m_pos.m_z += _dz;
+// }
 
 
 

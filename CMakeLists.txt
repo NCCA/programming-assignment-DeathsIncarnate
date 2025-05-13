@@ -47,6 +47,10 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
 			${PROJECT_SOURCE_DIR}/include/NGLScene.h
             ${PROJECT_SOURCE_DIR}/include/Particle.h
             ${PROJECT_SOURCE_DIR}/include/Emitter.h
+            ${PROJECT_SOURCE_DIR}/src/BoundingBox.cpp
+            ${PROJECT_SOURCE_DIR}/include/BoundingBox.h
+            ${PROJECT_SOURCE_DIR}/include/Physics.h
+            ${PROJECT_SOURCE_DIR}/src/Physics.cpp
             ${PROJECT_SOURCE_DIR}/src/Emitter.cpp
 
 )

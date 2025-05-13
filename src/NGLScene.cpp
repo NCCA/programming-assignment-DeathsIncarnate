@@ -185,7 +185,7 @@ void NGLScene::processKeys()
 
     }
   }
-  m_emitter->move(dx, dy, dz);
+  //m_emitter->move(dx, dy, dz);
 }
 
 
