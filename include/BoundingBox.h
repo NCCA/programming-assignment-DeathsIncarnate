@@ -28,7 +28,7 @@ public:
 
 
 private:
-    float m_width = 50.0f;
+    float m_width = 100.0f;
     float m_height = 50.0f;
     float m_depth = 50.0f;
     std::unique_ptr<ngl::MultiBufferVAO> m_boxVAO;

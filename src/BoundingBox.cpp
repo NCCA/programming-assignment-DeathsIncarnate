@@ -88,7 +88,7 @@ void BoundingBox::renderBoundingBox() const
 void BoundingBox::resolveCollisions(size_t _i, std::vector<ngl::Vec4>& m_ppos, std::vector<ngl::Vec3>& m_pdir, std::vector<float>& m_psize)
 {
     ngl::Vec3 boundSize(m_width, m_height, m_depth); // Proper bounding box
-    float collisionDamping = 0.7f; // Controls bounce effect
+    float collisionDamping = 0.5f; // Controls bounce effect
     ngl::Vec3 halfBoundSize = boundSize * 0.5f - ngl::Vec3(1.0f, 1.0f, 1.0f) * m_psize[_i];
 
     // X-axis collision
@@ -106,12 +106,12 @@ void BoundingBox::resolveCollisions(size_t _i, std::vector<ngl::Vec4>& m_ppos, s
          // m_pdir[_i].m_y = -std::abs(m_pdir[_i].m_y) * collisionDamping;
          m_pdir[_i].m_y *= -collisionDamping;  // Reverse velocity
 
-     //     // Small upward push to avoid getting stuck
-     //     if (std::abs(m_pdir[_i].m_y) < 0.1f)
-     //     {
-     //         m_pdir[_i].m_y += 0.5f;
-     //         // m_pdir[_i].m_y = 1.0f; // minimum bounce impulse
-     //     }
+     // Small upward push to avoid getting stuck
+     if (std::abs(m_pdir[_i].m_y) < 0.1f)
+     {
+         m_ppos[_i].m_y = 1.0f;
+         // m_pdir[_i].m_y = 1.0f; // minimum bounce impulse
+     }
      }
 
 

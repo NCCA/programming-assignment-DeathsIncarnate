@@ -32,8 +32,8 @@ public:
     float m_maxDensity = 0.0f;
     // Add these to your Emitter.h in the private section:
     float m_targetDensity = 1000.0f; // Typical water density kg/m³
-    float m_pressureMultiplier = 0.1f; // Stiffness constant
-    float m_viscosityStrength = 0.01f;
+    float m_pressureMultiplier = 0.15f; // Stiffness constant
+    float m_viscosityStrength = 0.115f;
     float m_damping = 0.01f;
     const float m_particleSpacing = 1.5f;
 

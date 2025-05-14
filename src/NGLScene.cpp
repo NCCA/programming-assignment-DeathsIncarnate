@@ -56,7 +56,7 @@ void NGLScene::initializeGL()
   m_text -> setColour(1,1,1);
   startTimer(10);
 
-  m_view = ngl::lookAt({0,40,40}, {0,0,0}, {0,1,0});
+  m_view = ngl::lookAt({0,20,120}, {0,0,0}, {0,1,0});
 
 
 }

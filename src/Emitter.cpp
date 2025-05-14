@@ -226,7 +226,7 @@ void Emitter::update(float _dt)
             ngl::Vec3 totalForce = pressureForce + viscosityForce + gravityForce ; //+ (cursorForce*2000000) * _dt;
             ngl::Vec3 acceleration = totalForce / m_physics->m_particleMass;// / 2.0f * _dt; /// 10000.0f;
             m_pdir[i] += acceleration * _dt;
-            m_ppos[i] += m_pdir[i] * _dt; // * 0.5;
+            m_ppos[i] += m_pdir[i] * (1.0f / 50.0f);// * _dt; // * 0.5;
 
             m_boundingBox.resolveCollisions(i, m_ppos, m_pdir, m_psize);
 

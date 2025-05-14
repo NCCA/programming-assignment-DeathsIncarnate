@@ -113,7 +113,7 @@ ngl::Vec3 Physics::calculateViscosityForce(size_t _particleIndex, size_t m_maxPa
         const ngl::Vec3 force = velocityDiff * (m_viscosityStrength * influence * m_particleMass / m_densities[otherIndex]);
 
         // Newton's Third Law application:
-        viscosityForce -= force;  // Our particle gets the opposite force
+        viscosityForce += force;  // Our particle gets the opposite force
         // Note: The other particle will get +force when its turn comes
     }
 
@@ -141,6 +141,13 @@ float Physics::convertDensityToPressure(float _density) const
     const float densityError = _density - m_targetDensity;
     return densityError * m_pressureMultiplier;
 }
+
+// float Physics::convertNearDensityToNearPressure(float _density) const
+// {
+//     const float densityError = _density - m_targetDensity;
+//     return nearDensity * m_nearPressureMultiplier;
+// }
+
 
 // float Emitter::convertDensityToPressure(float _density) const {
 //     const float ratio = _density / m_restDensity;
