@@ -52,6 +52,8 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
             ${PROJECT_SOURCE_DIR}/include/Physics.h
             ${PROJECT_SOURCE_DIR}/src/Physics.cpp
             ${PROJECT_SOURCE_DIR}/src/Emitter.cpp
+            ${PROJECT_SOURCE_DIR}/src/ControlPanel.cpp
+            ${PROJECT_SOURCE_DIR}/include/ControlPanel.h
 
 )
 

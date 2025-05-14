@@ -5,11 +5,13 @@
 #include "WindowParams.h"
 // this must be included after NGL includes else we get a clash with gl libs
 #include <QOpenGLWindow>
+#include <QDockWidget>  // Add this
 #include "Emitter.h"
 #include <memory>
 #include <chrono>
 #include <QSet>
 #include <ngl/Text.h>
+#include "ControlPanel.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -27,6 +29,7 @@
 
 class NGLScene : public QOpenGLWindow
 {
+    Q_OBJECT  // Add this macro for signals/slots
   public:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief ctor for our NGL drawing class
@@ -52,6 +55,7 @@ class NGLScene : public QOpenGLWindow
     void resizeGL(int _w, int _h) override;
 
     ngl::Vec3 screenToWorld(int _x, int _y) const;
+    // void createControlPanel();
 
 private:
 
@@ -101,6 +105,10 @@ private:
     QSet<Qt::Key> m_keysPressed;
 
     std::unique_ptr<ngl::Text> m_text;
+
+    // // Add control panel members
+    // QDockWidget *m_dock;
+    // ControlPanel *m_controlPanel;
 
 };
 

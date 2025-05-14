@@ -2,6 +2,8 @@
 
 #include <QMouseEvent>
 #include <QGuiApplication>
+#include "ControlPanel.h"
+#include <QMainWindow>
 
 #include "NGLScene.h"
 #include <ngl/NGLInit.h>
@@ -58,6 +60,7 @@ void NGLScene::initializeGL()
 
   m_view = ngl::lookAt({0,20,120}, {0,0,0}, {0,1,0});
 
+  // createControlPanel();
 
 }
 
@@ -202,3 +205,16 @@ void NGLScene::timerEvent(QTimerEvent *_event)
   }
   update();
 }
+
+//
+// void NGLScene::createControlPanel()
+// {
+//   // Only create if we have a QMainWindow parent
+//   if (auto *mainWin = qobject_cast<Qop*>(window()))
+//   {
+//     m_dock = new QDockWidget("SPH Controls", mainWin);
+//     m_controlPanel = new ControlPanel(m_emitter.get(), m_dock);
+//     m_dock->setWidget(m_controlPanel);
+//     mainWin->addDockWidget(Qt::RightDockWidgetArea, m_dock);
+//   }
+// }
