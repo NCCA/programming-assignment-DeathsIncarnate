@@ -17,6 +17,10 @@ https://www.youtube.com/watch?v=4upU4l5SSSU
 
 https://youtu.be/8ev3agKAYug 
 
+FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI controls; all changes to variables have to be manual.)
+
+https://www.youtube.com/watch?v=REkTUbwJWNQ
+
 - The first video shows how it simulates a fluid simulation quite accurately at the right recommended intialization of floats. The second video shows how the variables can be changed such as bounding box dimentions, all physics values and even starting intialization before runing with manual changing of the variables eg. m_pressureMultiplier, m_viscosityStrength and m_particleSpacing in physics.h. Particle spacing involves the amount of particles initially distributed within the square and therefore directly affects how many particles are in the scene. Also the dimensions of the bounding box can be changed in BoundingBox.h with the m,easurements affecting the bounds collisions as well as there VAO.
 
 
