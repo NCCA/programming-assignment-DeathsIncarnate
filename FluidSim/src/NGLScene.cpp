@@ -2,7 +2,6 @@
 
 #include <QMouseEvent>
 #include <QGuiApplication>
-#include "ControlPanel.h"
 #include <QMainWindow>
 
 #include "NGLScene.h"
@@ -63,6 +62,7 @@ void NGLScene::initializeGL()
   // createControlPanel();
 
 }
+
 
 void NGLScene::paintGL()
 {

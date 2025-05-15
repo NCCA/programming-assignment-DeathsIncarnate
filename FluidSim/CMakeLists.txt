@@ -22,6 +22,8 @@ find_package(NGL CONFIG REQUIRED)
 # Instruct CMake to run moc automatically when needed (Qt projects only)
 set(CMAKE_AUTOMOC ON)
 # find Qt libs
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/ui)
 # find Qt libs first we check for Version 6
 find_package(Qt6 COMPONENTS OpenGL Widgets QUIET )
 if ( Qt6_FOUND )
@@ -52,8 +54,8 @@ target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
             ${PROJECT_SOURCE_DIR}/include/Physics.h
             ${PROJECT_SOURCE_DIR}/src/Physics.cpp
             ${PROJECT_SOURCE_DIR}/src/Emitter.cpp
-            ${PROJECT_SOURCE_DIR}/src/ControlPanel.cpp
-            ${PROJECT_SOURCE_DIR}/include/ControlPanel.h
+            ${PROJECT_SOURCE_DIR}/src/MainWindow.cpp
+            ${PROJECT_SOURCE_DIR}/include/MainWindow.h
 
 )
 

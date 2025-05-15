@@ -11,7 +11,6 @@
 #include <chrono>
 #include <QSet>
 #include <ngl/Text.h>
-#include "ControlPanel.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -27,7 +26,7 @@
 /// put in this file
 //----------------------------------------------------------------------------------------------------------------------
 
-class NGLScene : public QOpenGLWindow
+class NGLScene : public QOpenGLWindow//public QOpenGLWindow
 {
     Q_OBJECT  // Add this macro for signals/slots
   public:
