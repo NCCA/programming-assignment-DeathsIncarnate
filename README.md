@@ -45,6 +45,10 @@ https://www.youtube.com/watch?v=4upU4l5SSSU
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Annotated Bibliography and Research:
 
+Reference list
+Lague, S., 2023. Coding Adventure: Simulating Fluids [online]. www.youtube.com. Available from: https://www.youtube.com/watch?v=rSKMYc1CQHE [Accessed 5 Apr 2023].
+Weaver, T. and Xiao, Z., 2016. Fluid Simulation by the Smoothed Particle Hydrodynamics Method: A Survey [online]. Available from: https://eprints.bournemouth.ac.uk/23384/1/2016%20Fluid%20simulation.pdf [Accessed 9 Apr 2023].
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
