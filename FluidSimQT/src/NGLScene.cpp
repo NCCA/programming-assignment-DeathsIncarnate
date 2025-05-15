@@ -169,6 +169,9 @@ void NGLScene::initialize()
 {
   m_emitter->m_physics->m_maxParticles = 50000.0f;
   m_emitter->initializeParticles(m_emitter->yOffset);
+  // m_emitter->m_boundingBox.updateVAO();
+  // m_emitter->m_boundingBox.renderBoundingBox();
+  // update();
 }
 
 void NGLScene::timerEvent(QTimerEvent *_event)

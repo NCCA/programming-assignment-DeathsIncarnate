@@ -37,11 +37,12 @@ class Emitter
     void initializeParticles(float yOffset);
     std::unique_ptr<Physics> m_physics;
 
+    BoundingBox m_boundingBox;
+
 
 
 
     private:
-    BoundingBox m_boundingBox;
 
 
 

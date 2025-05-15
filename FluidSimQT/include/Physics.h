@@ -37,7 +37,7 @@ public:
     float m_particleSpacing = 1.5f;
 
 
-    float m_smoothingRadius = 3.0f;   // Adjust based on scale
+    float m_smoothingRadius = 2 * m_particleSpacing;   // Adjust based on scale
 
     size_t m_maxParticles;
 
