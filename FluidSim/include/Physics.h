@@ -25,7 +25,6 @@ public:
     float calculateSharedPressure(float densityA, float densityB) const;
     ngl::Vec3 calculatePressureForce(size_t _particleIndex, size_t m_maxParticles) const;
 
-    float m_smoothingRadius = 3.0f;   // Adjust based on scale
     float m_particleMass = 1.0f;      // Typically 1.0 for simplicity
     float m_restDensity = 1000.0f;    // Water-like density
     std::vector<float> m_densities;
@@ -36,6 +35,8 @@ public:
     float m_viscosityStrength = 0.115f;
     float m_damping = 0.01f;
     const float m_particleSpacing = 1.5f;
+
+    float m_smoothingRadius = 2 * m_particleSpacing;   // Adjust based on scale
 
     size_t m_maxParticles;
 
