@@ -2,7 +2,7 @@ Jacques Moss s5616052 CFGAA Assigment
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Report for my Assignment:
 
-##Please Use FluidSimQT as that is the final save. However FluidSim is quicker efficiency wise.
+### Please use FluidSimQT as that is the final save. However FluidSim is quicker efficiency wise.
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Initial Idea:
 
