@@ -23,12 +23,16 @@ FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI
 
  https://youtu.be/Kcz7_Tj5SKw 
  
-- The first video shows how it simulates a fluid simulation quite accurately at the right recommended intialization of floats. The second video shows how the variables can be changed such as bounding box dimentions, all physics values and even starting intialization before runing with manual changing of the variables eg. m_pressureMultiplier, m_viscosityStrength and m_particleSpacing in physics.h. Particle spacing involves the amount of particles initially distributed within the square and therefore directly affects how many particles are in the scene. Also the dimensions of the bounding box can be changed in BoundingBox.h with the m,easurements affecting the bounds collisions as well as there VAO.
+- The first video shows how it simulates a fluid simulation quite accurately at the right recommended intialization of floats. The second video shows how the variables can be changed such as bounding box dimensions, all physics values and even starting intialization before runing with manual changing of the variables eg. m_pressureMultiplier, m_viscosityStrength and m_particleSpacing in physics.h. Particle spacing involves the amount of particles initially distributed within the square and therefore directly affects how many particles are in the scene. Also the dimensions of the bounding box can be changed in BoundingBox.h with the measurements affecting the bounds collisions as well as there VAO.
+
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## How to use:
 
-- Make sure you have all the files 
+- Make sure you have all of the files in FluidSimQT and make sure they all organised as it is in the github repository.
+- Run "clion ." in the terminal within FluidSimQT.
+- Within Clion make sure to go to your build in the top right corner and link your copyshaders to the build using cmake target.
+- Press ctrl + f5/ build and run using the buttons in the top right corner.
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## What my code does:
 
@@ -37,14 +41,19 @@ FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI
 - Creates and draws a boundary box that repels particles when they collide and dampens the force.
 - Uses a vertex and fragment shader in order to determine and normalize the density in certain areas and colour those areas more red where density is higher.
 - Created a QT GUI that applys yOffset, Pressure Multiplier and Viscosity Strength based off of input values from the user.
-
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-## Potential improvements:
+## Variables and Usage:
+- **pressureMultiplier** in **physics.h** effects how particles are seperated based of the amount of particles (density) within a certain radius(smoothing kernel.) Can be changed to make the particles more repulsive agaisnt eachother.
+- **viscosityStrength** in **physics.h** effects the movement of the particles and how they flow in a more similiar direction when the viscosity is higher.
+- **particleSpacing** effects the distant between particles when initialized and therefore the amount of particles in the intialized cube at the start. The cube will stay the same size having the same dimensions unless changed manually which it can be in the **initializeParticles** function. However the spacing between particles can be changed. The particle spacing currently directly effects the **smoothingKernel**. **Unfortunately the values from qt dont get passed through properly for this variable yet. Only can be changed manually in code**
+- **m_width, m_height and m_depth** are the variables in **BoundingBox.h** that can change the physical dimensions of the m_boxVAO and how it is drawn and resolves collisions.**Unfortunately the values from qt dont get passed through properly for this variable yet. Only can be changed manually in code**
+- **yOffset** found in **initializeParticles** effects how high the cube is in the y-axis when initialzed.
 
-- I would've liked to include a spatial hashing system in order to speed up calculations as less not all densities would be calculated and only the densities within the smoothing kernel.
-- I would've liked if my values from QT were properly passed and assessable within my functions to allow for better user interface for changing ther variables.
+- There is alot of other variables but for user access these are the best variables to mess around with if you don't have any knowledge about SPH fluid simulations.
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+## ALL variables work properly and can be changed manuallynin the code before running to effect the conditions. Unfortunately not all of the qt values are able to be transferred to these variables as of yet. 
+
+-------------------------------------------------------------
 ## Structure of Directory:
 
 - src: main.cpp, NGLScene.cpp, NGLSceneMouseControls.cpp, Physics.cpp, Emitter.cpp, BoundingBox.cpp, MainWindow.cpp
@@ -52,13 +61,19 @@ FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI
 - CMakeList.txt
 - ui: MainWindow.ui
 - shaders: ParticleFragment.glsl, ParticleVertex.glsl
+------------------------------------------------------------------------------------------------------------------------------------------------------
+## Potential improvements:
+
+- I would've liked to include a spatial hashing system in order to speed up calculations as less not all densities would be calculated and only the densities within the smoothing kernel.
+- I would've liked if my values from QT were properly passed and assessable within my functions to allow for better user interface for changing ther variables.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Annotated Bibliography and Research:
 
 Reference list
-- Lague, S., 2023. Coding Adventure: Simulating Fluids [online]. www.youtube.com. Available from: https://www.youtube.com/watch?v=rSKMYc1CQHE [Accessed 5 Apr 2023].
-- Weaver, T. and Xiao, Z., 2016. Fluid Simulation by the Smoothed Particle Hydrodynamics Method: A Survey [online]. Available from: https://eprints.bournemouth.ac.uk/23384/1/2016%20Fluid%20simulation.pdf [Accessed 9 Apr 2023].
+- Lague, S., 2023. Coding Adventure: Simulating Fluids [online]. www.youtube.com. Available from: https://www.youtube.com/watch?v=rSKMYc1CQHE [Accessed 15 May 2025].
+- - Macey, J., 2025. Jon Macey’s WebPages [online]. Jon Macey’s WebPages. Available from: https://nccastaff.bournemouth.ac.uk/jmacey/ [Accessed 15 May 2025].
+- Weaver, T. and Xiao, Z., 2016. Fluid Simulation by the Smoothed Particle Hydrodynamics Method: A Survey [online]. Available from: https://eprints.bournemouth.ac.uk/23384/1/2016%20Fluid%20simulation.pdf [Accessed 9 Apr 2025].
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
