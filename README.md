@@ -92,7 +92,7 @@ Reference list
   - I used Particle SOA a temolate for Jon Macey's particle system which I made in class with him and then built off of this code the rest of my fluid simulation code. Manipulating and changing how the particles are drawn to the screen, coloured and updated thrloughout this scene and adapting the code to work better for me.
 
 - Weaver, T. and Xiao, Z., 2016. Fluid Simulation by the Smoothed Particle Hydrodynamics Method: A Survey [online]. Available from: https://eprints.bournemouth.ac.uk/23384/1/2016%20Fluid%20simulation.pdf [Accessed 9 Apr 2025].
-  -This is a master's paper from a bournemouth universiy alumni which helped me understand in tangent with the Lague youtube video what algorithms and equations are needed to create and effect my particles and make it move like fluid. This paper is very in-depth about the mathematical background behind how fluid simulations work and how to break down the overall maths into funtions and steps in order to create the overall project.
+  - This is a master's paper from a bournemouth universiy alumni which helped me understand in tangent with the Lague youtube video what algorithms and equations are needed to create and effect my particles and make it move like fluid. This paper is very in-depth about the mathematical background behind how fluid simulations work and how to break down the overall maths into funtions and steps in order to create the overall project.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
