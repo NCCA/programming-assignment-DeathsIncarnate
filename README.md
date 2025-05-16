@@ -66,6 +66,7 @@ FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI
 
 - I would've liked to include a spatial hashing system in order to speed up calculations as less not all densities would be calculated and only the densities within the smoothing kernel.
 - I would've liked if my values from QT were properly passed and assessable within my functions to allow for better user interface for changing ther variables.
+- I wanted to allow the user to effect the fluid with repulsion and attraction mechanics around the mouse cursor.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Annotated Bibliography and Research:
