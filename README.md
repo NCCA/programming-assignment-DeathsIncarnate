@@ -67,7 +67,9 @@ https://youtu.be/Kcz7_Tj5SKw
 - ui: MainWindow.ui
 - shaders: ParticleFragment.glsl, ParticleVertex.glsl
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-## Potential improvements:
+## Evaluation and Potential improvements:
+I ran into a few issues with my code especially when dealing with VAOS and QT where VAOS weren't intialized or acessed properly to be drawn and that the va;lues in QT were'nt being passed through into the variables and my header files. I also ran into an issue where my smoothing kernel value was directly effecting my density value which shouldn't be happening. Also my particles were slowly but surely merging with the ground at y=0. Unfortnately these were the errors I wasn't able to fix directly. I had other errors that i ran into that I was able to completely and safely resolve but for these problems I had to work around them. I got some of the QT values passing through properly by referncing multiple pointers to make sure values were accessed afetr being initialized and not null. I managed to temporarily fix the particles combining at y=0 by adding a minimum repulsive force from the floor. Overal if I had more time i know what I would adapt and try to fix to make my fluid simulation running more efficiently and better.
+
 
 - I would've liked to include a spatial hashing system in order to speed up calculations as less not all densities would be calculated and only the densities within the smoothing kernel.
 - I would've liked if my values from QT were properly passed and assessable within my functions to allow for better user interface for changing ther variables.
