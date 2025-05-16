@@ -36,11 +36,11 @@ FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## What my code does:
 
-- Uses ParticleSOA by Jon Macey to create a partcle system.
+- Uses ParticleSOA by Jon Macey to create a particle system.
 - Calculates density, pressure and viscosity and applys to the particles based off acceleration and closeness of other particles.
 - Creates and draws a boundary box that repels particles when they collide and dampens the force.
 - Uses a vertex and fragment shader in order to determine and normalize the density in certain areas and colour those areas more red where density is higher.
-- Created a QT GUI that applys yOffset, Pressure Multiplier and Viscosity Strength based off of input values from the user.
+- Created a QT GUI using BlankQTNgl and qt creqator. Applying yOffset, Pressure Multiplier and Viscosity Strength based off of input values from the user.
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Variables and Usage:
 - **pressureMultiplier** in **physics.h** effects how particles are seperated based of the amount of particles (density) within a certain radius(smoothing kernel.) Can be changed to make the particles more repulsive agaisnt eachother.
