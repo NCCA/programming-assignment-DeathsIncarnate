@@ -72,7 +72,9 @@ FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI
 
 Reference list
 - Lague, S., 2023. Coding Adventure: Simulating Fluids [online]. www.youtube.com. Available from: https://www.youtube.com/watch?v=rSKMYc1CQHE [Accessed 15 May 2025].
-- - Macey, J., 2025. Jon Macey’s WebPages [online]. Jon Macey’s WebPages. Available from: https://nccastaff.bournemouth.ac.uk/jmacey/ [Accessed 15 May 2025].
+- Macey, J., 2025. Jon Macey’s WebPages [online]. Jon Macey’s WebPages. Available from: https://nccastaff.bournemouth.ac.uk/jmacey/ [Accessed 15 May 2025].
+- NCCA, 2024. GitHub - NCCA/BlankQtNGL [online]. GitHub. Available from: https://github.com/NCCA/BlankQtNGL [Accessed 15 May 2025].
+- NCCA, 2025. GitHub - NCCA/labcode-jmacey-2: labcode-jmacey-2 created by GitHub Classroom [online]. GitHub. Available from: https://github.com/NCCA/labcode-jmacey-2 [Accessed 20 Apr 2025].
 - Weaver, T. and Xiao, Z., 2016. Fluid Simulation by the Smoothed Particle Hydrodynamics Method: A Survey [online]. Available from: https://eprints.bournemouth.ac.uk/23384/1/2016%20Fluid%20simulation.pdf [Accessed 9 Apr 2025].
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
