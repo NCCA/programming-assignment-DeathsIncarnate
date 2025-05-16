@@ -51,7 +51,7 @@ FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI
 
 - There is alot of other variables but for user access these are the best variables to mess around with if you don't have any knowledge about SPH fluid simulations.
 
-## ALL variables work properly and can be changed manuallynin the code before running to effect the conditions. Unfortunately not all of the qt values are able to be transferred to these variables as of yet. 
+### ALL variables work properly and can be changed manuallynin the code before running to effect the conditions. Unfortunately not all of the qt values are able to be transferred to these variables as of yet. 
 
 -------------------------------------------------------------
 ## Structure of Directory:
