@@ -53,6 +53,9 @@ FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI
 
 ### ALL variables work properly and can be changed manually in the code before running to effect the conditions. Unfortunately not all of the qt values are able to be transferred to these variables as of yet. 
 
+
+![Screenshot from 2025-05-16 10-04-41](https://github.com/user-attachments/assets/2de94072-1abc-4a23-8a89-a69aec072acd)
+
 -------------------------------------------------------------
 ## Structure of Directory:
 
