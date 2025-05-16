@@ -80,19 +80,19 @@ I ran into a few issues with my code especially when dealing with VAOS and QT wh
 
 Reference list
 - Lague, S., 2023. Coding Adventure: Simulating Fluids [online]. www.youtube.com. Available from: https://www.youtube.com/watch?v=rSKMYc1CQHE [Accessed 15 May 2025].
-A very useful youtube video which takes you through a simulation creation on unity of a 2D particle system, with the included maths and a great visual description of how that maths applies to the screen. This was one of my primary sources of research and I worked closeluy with this video in order to build my system.
+- - A very useful youtube video which takes you through a simulation creation on unity of a 2D particle system, with the included maths and a great visual description of how that maths applies to the screen. This was one of my primary sources of research and I worked closeluy with this video in order to build my system.
 
 - Macey, J., 2025. Jon Macey’s WebPages [online]. Jon Macey’s WebPages. Available from: https://nccastaff.bournemouth.ac.uk/jmacey/ [Accessed 15 May 2025].
-All my professor Jon Macey's working resources and lessons with links to how he builds his code and the theory behind hsi code, QT and other resources.
+- - All my professor Jon Macey's working resources and lessons with links to how he builds his code and the theory behind hsi code, QT and other resources.
   
 - NCCA, 2024. GitHub - NCCA/BlankQtNGL [online]. GitHub. Available from: https://github.com/NCCA/BlankQtNGL [Accessed 15 May 2025].
-A blankQTNGL template which I used as boiler plate code so that I could easily create my GUI in QT and then add my running code from clion and copy it over to this GUI code.
+- - A blankQTNGL template which I used as boiler plate code so that I could easily create my GUI in QT and then add my running code from clion and copy it over to this GUI code.
 
 - NCCA, 2025. GitHub - NCCA/labcode-jmacey-2: labcode-jmacey-2 created by GitHub Classroom [online]. GitHub. Available from: https://github.com/NCCA/labcode-jmacey-2 [Accessed 20 Apr 2025].
-I used Particle SOA a temolate for Jon Macey's particle system which I made in class with him and then built off of this code the rest of my fluid simulation code. Manipulating and changing how the particles are drawn to the screen, coloured and updated thrloughout this scene and adapting the code to work better for me.
+- - I used Particle SOA a temolate for Jon Macey's particle system which I made in class with him and then built off of this code the rest of my fluid simulation code. Manipulating and changing how the particles are drawn to the screen, coloured and updated thrloughout this scene and adapting the code to work better for me.
 
 - Weaver, T. and Xiao, Z., 2016. Fluid Simulation by the Smoothed Particle Hydrodynamics Method: A Survey [online]. Available from: https://eprints.bournemouth.ac.uk/23384/1/2016%20Fluid%20simulation.pdf [Accessed 9 Apr 2025].
-This is a master's paper from a bournemouth universiy alumni which helped me understand in tangent with the Lague youtube video what algorithms and equations are needed to create and effect my particles and make it move like fluid. This paper is very in-depth about the mathematical background behind how fluid simulations work and how to break down the overall maths into funtions and steps in order to create the overall project.
+- -This is a master's paper from a bournemouth universiy alumni which helped me understand in tangent with the Lague youtube video what algorithms and equations are needed to create and effect my particles and make it move like fluid. This paper is very in-depth about the mathematical background behind how fluid simulations work and how to break down the overall maths into funtions and steps in order to create the overall project.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 
