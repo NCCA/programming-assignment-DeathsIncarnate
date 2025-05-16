@@ -2,10 +2,8 @@
 #include <iostream>
 #include <ngl/Random.h>
 #include <algorithm>
-#include <ngl/VAOPrimitives.h>
 #include <ngl/VAOFactory.h>
 #include <ngl/ShaderLib.h>
-#include <ngl/Transformation.h>
 #include <ngl/MultiBufferVAO.h>
 #include "Physics.h"
 
@@ -330,15 +328,19 @@ void Emitter::initializeParticles(float yOffset)
     const float halfLength = actualSideLength * 0.5f;
 
     // Set uniform particle size
-    for (size_t i = 0; i < m_maxParticles; ++i) {
+    for (size_t i = 0; i < m_maxParticles; ++i)
+    {
         m_psize[i] = 4.0f; // Or your preferred size
     }
 
     // Place particles in perfect grid
     size_t particleIndex = 0;
-    for (int x = 0; x < particlesPerAxis && particleIndex < m_maxParticles; ++x) {
-        for (int y = 0; y < particlesPerAxis && particleIndex < m_maxParticles; ++y) {
-            for (int z = 0; z < particlesPerAxis && particleIndex < m_maxParticles; ++z) {
+    for (int x = 0; x < particlesPerAxis && particleIndex < m_maxParticles; ++x)
+    {
+        for (int y = 0; y < particlesPerAxis && particleIndex < m_maxParticles; ++y)
+        {
+            for (int z = 0; z < particlesPerAxis && particleIndex < m_maxParticles; ++z)
+            {
                 // Calculate grid position (centered around origin)
                 float px = x * effectiveParticleDiameter - halfLength;
                 float py = y * effectiveParticleDiameter - halfLength + yOffset;

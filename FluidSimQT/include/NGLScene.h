@@ -3,7 +3,6 @@
 
 #include <ngl/Vec3.h>
 #include "WindowParams.h"
-#include <QEvent>
 #include <QResizeEvent>
 #include <QOpenGLWidget>
 #include <memory>

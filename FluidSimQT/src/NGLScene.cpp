@@ -106,24 +106,29 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   {
 
   case Qt::Key_M:
-    m_emitter->toggleCursorInteraction();
-    break;
+    {
+      m_emitter->toggleCursorInteraction();
+      break;
+    }
 
     // escape key to quite
-  case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
+  case Qt::Key_Escape : {QGuiApplication::exit(EXIT_SUCCESS); break;}
   case Qt::Key_Space :
-
-    m_win.spinXFace=0;
-    m_win.spinYFace=0;
-    m_modelPos.set(ngl::Vec3::zero());
+    {
+      m_win.spinXFace=0;
+      m_win.spinYFace=0;
+      m_modelPos.set(ngl::Vec3::zero());
+    }
 
   case Qt::Key_S:
-    m_emitter->m_simulate = !m_emitter->m_simulate;
-    break;
+    {
+      m_emitter->m_simulate = !m_emitter->m_simulate;
+      break;
+    }
 
 
     break;
-  case Qt::Key_A : m_animate ^= true; break;
+  case Qt::Key_A : {m_animate ^= true; break;}
   default : break;
   }
   // finally update the GLWindow and re-draw
@@ -140,10 +145,10 @@ void NGLScene::processKeys()
   {
     switch(key)
     {
-    case Qt::Key_Left: dx -= inc; break;
-    case Qt::Key_Right: dx += inc; break;
-    case Qt::Key_Down: dz -= inc; break;
-    case Qt::Key_Up: dz += inc; break;
+    case Qt::Key_Left: {dx -= inc; break;}
+    case Qt::Key_Right: {dx += inc; break;}
+    case Qt::Key_Down: {dz -= inc; break;}
+    case Qt::Key_Up: {dz += inc; break;}
 
     }
   }

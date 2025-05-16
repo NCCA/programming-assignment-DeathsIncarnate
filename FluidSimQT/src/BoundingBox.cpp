@@ -6,8 +6,6 @@
 #include <ngl/VAOFactory.h>
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
-#include <ngl/VAOFactory.h>
-#include <ngl/ShaderLib.h>
 #include <ngl/Transformation.h>
 #include <ngl/MultiBufferVAO.h>
 
@@ -22,7 +20,8 @@ void BoundingBox::initBoundingBoxVAO()
     const float hw = m_width/2, hd = m_depth/2;
 
     // Define the 8 corners of the box
-    std::vector<ngl::Vec3> vertices = {
+    std::vector<ngl::Vec3> vertices =
+    {
         // Bottom face
         {-hw, 0, -hd}, {hw, 0, -hd},
         {hw, 0, -hd}, {hw, 0, hd},

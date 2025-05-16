@@ -2,13 +2,9 @@
 // Created by s5616052 on 13/05/25.
 //
 #include "Physics.h"
-
 #include <iostream>
 #include <ngl/Random.h>
-#include <algorithm>
-#include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
-#include <ngl/Transformation.h>
 
 Physics::Physics(std::vector<ngl::Vec4>& m_ppos, std::vector<ngl::Vec3>& m_pdir)
   :m_ppos(m_ppos), m_pdir(m_pdir)
@@ -27,12 +23,14 @@ static float SmoothingKernel(float radius, float dst)
     // Precomputed normalization constant
     const float norm = 8.0f / (M_PI * h3);
 
-    if (q <= 0.5f) {
+    if (q <= 0.5f)
+    {
         const float q2 = q * q;
         const float q3 = q2 * q;
         return norm * (1.0f - 6.0f * q2 + 6.0f * q3);
     }
-    else {
+    else
+    {
         const float term = 2.0f - q;
         return norm * (0.5f * term * term * term);
     }
@@ -50,10 +48,12 @@ static float SmoothingKernelDerivative(float radius, float dst)
     // Precomputed normalization constant
     const float norm = 8.0f / (M_PI * h4);
 
-    if (q <= 0.5f) {
+    if (q <= 0.5f)
+    {
         return norm * (3.0f * q - 4.5f * q * q);
     }
-    else {
+    else
+    {
         const float term = 2.0f - q;
         return norm * (-1.5f * term * term);
     }
