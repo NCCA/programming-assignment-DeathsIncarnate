@@ -2,7 +2,7 @@
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Report for my Assignment:
 
-### Please use FluidSimQT as that is the final save. However FluidSim is quicker efficiency wise.
+### Please use FluidSimQT as that is the final save with added QT. However FluidSim is quicker efficiency wise.
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Initial Idea:
 
