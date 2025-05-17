@@ -104,7 +104,7 @@ class Emitter
 
     // Spatial hashing methods
     void UpdateSpatialLookup();
-    std::array<int, 3> PositionToCellCoord(const ngl::Vec3& point) const;
+    std::array<int, 3> PositionToCellCoord(const ngl::Vec3& c_point) const;
     size_t HashCell(int cellX, int cellY, int cellZ) const;
     void ForEachNeighbor(size_t particleIdx, std::function<void(size_t)> callback);
     size_t GetKeyFromHash(size_t hash) const;

@@ -14,7 +14,6 @@ Emitter::Emitter(size_t _num, size_t _maxAlive, size_t _numPerFrame, ngl::Vec3 _
 m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos{_pos}, m_boundingBox()
 {
     m_physics = std::make_unique<Physics>(m_ppos, m_pdir);
-    m_maxParticles = _num;
     m_ppos.resize(m_maxParticles);
     m_pcolour.resize(m_maxParticles);
     m_pdir.resize(m_maxParticles);
@@ -304,12 +303,12 @@ void Emitter::update(float _dt)
 
 
 
-void Emitter::initializeParticles(float yOffset, float particleSpacing, size_t maxParticles)
+void Emitter::initializeParticles(float _yOffset, float _particleSpacing, size_t maxParticles)
 {
-    const float cubeSideLength = 25.0f; // Fixed 1000x1000x1000 volume
-    const float jitterStrength = 0.0f;
-    const float initialLife = 100.0f;
-    const float baseVelocityY = 2.0f;
+    const float c_cubeSideLength = 25.0f;
+    const float c_jitterStrength = 0.0f;
+    const float c_initialLife = 100.0f;
+    const float c_baseVelocityY = 2.0f;
     // const float particleSpacing = m_physics->m_particleSpacing; // Adjusts density
     // Set uniform particle size
 
@@ -319,8 +318,8 @@ void Emitter::initializeParticles(float yOffset, float particleSpacing, size_t m
     }
 
     // Calculate particles per axis based on spacing and size
-    const float effectiveParticleDiameter = m_psize[0] * 2 + particleSpacing;
-    const int particlesPerAxis = static_cast<int>(cubeSideLength / effectiveParticleDiameter);
+    const float effectiveParticleDiameter = m_psize[0] * 2 + _particleSpacing;
+    const int particlesPerAxis = static_cast<int>(c_cubeSideLength / effectiveParticleDiameter);
 
     // Calculate exact particle count that fits in the volume
     const size_t particlesThatFit = particlesPerAxis * particlesPerAxis * particlesPerAxis;
@@ -351,24 +350,24 @@ void Emitter::initializeParticles(float yOffset, float particleSpacing, size_t m
             {
                 // Calculate grid position (centered around origin)
                 float px = x * effectiveParticleDiameter - halfLength;
-                float py = y * effectiveParticleDiameter - halfLength + yOffset;
+                float py = y * effectiveParticleDiameter - halfLength + _yOffset;
                 float pz = z * effectiveParticleDiameter - halfLength;
 
                 // Add slight randomness
                 m_ppos[particleIndex] = ngl::Vec3(
-                    px + ngl::Random::randomNumber() * jitterStrength,
-                    py + ngl::Random::randomNumber() * jitterStrength,
-                    pz + ngl::Random::randomNumber() * jitterStrength
+                    px + ngl::Random::randomNumber() * c_jitterStrength,
+                    py + ngl::Random::randomNumber() * c_jitterStrength,
+                    pz + ngl::Random::randomNumber() * c_jitterStrength
                 );
 
                 // Initial velocity (mostly upward)
                 m_pdir[particleIndex] = ngl::Vec3(
                     ngl::Random::randomNumber(1.0f),
-                    ngl::Random::randomPositiveNumber(2.0f) + baseVelocityY,
+                    ngl::Random::randomPositiveNumber(2.0f) + c_baseVelocityY,
                     ngl::Random::randomNumber(1.0f)
                 );
 
-                m_plife[particleIndex] = initialLife;
+                m_plife[particleIndex] = c_initialLife;
                 m_pcolour[particleIndex] = ngl::Random::getRandomColour3();
                 m_pstate[particleIndex] = ParticleState::Active;
 

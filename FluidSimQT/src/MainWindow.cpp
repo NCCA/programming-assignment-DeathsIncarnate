@@ -93,20 +93,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateSimulationParameters()
 {
-    const double yOffset = m_ui->doubleSpinBox->value();
-    const double particleSpacing = m_ui->doubleSpinBox_2->value();
-    const double pressureMultiplier = m_ui->doubleSpinBox_3->value();
-    const double viscosityStrength = m_ui->doubleSpinBox_4->value();
-    const int width = m_ui->spinBox->value();
-    const int height = m_ui->spinBox_2->value();
-    const int depth = m_ui->spinBox_3->value();
+    double _yOffset = m_ui->doubleSpinBox->value();
+    double _particleSpacing = m_ui->doubleSpinBox_2->value();
+    double _pressureMultiplier = m_ui->doubleSpinBox_3->value();
+    double _viscosityStrength = m_ui->doubleSpinBox_4->value();
+    int _width = m_ui->spinBox->value();
+    int _height = m_ui->spinBox_2->value();
+    int _depth = m_ui->spinBox_3->value();
 
     std::cout << "Updating parameters:\n"
-              << "  yOffset: " << yOffset << "\n"
-              << "  particleSpacing: " << particleSpacing << "\n"
-              << "  pressureMultiplier: " << pressureMultiplier << "\n"
-              << "  viscosityStrength: " << viscosityStrength << "\n"
-              << "  Dimensions: " << width << "x" << height << "x" << depth << std::endl;
+              << "  yOffset: " << _yOffset << "\n"
+              << "  particleSpacing: " << _particleSpacing << "\n"
+              << "  pressureMultiplier: " << _pressureMultiplier << "\n"
+              << "  viscosityStrength: " << _viscosityStrength << "\n"
+              << "  Dimensions: " << _width << "x" << _height << "x" << _depth << std::endl;
 
-    m_gl->updateValues(pressureMultiplier, viscosityStrength, particleSpacing, yOffset, width, height, depth);
+    m_gl->updateValues(_pressureMultiplier, _viscosityStrength, _particleSpacing, _yOffset, _width, _height, _depth);
 }

@@ -20,10 +20,7 @@ public:
 
     void initBoundingBoxVAO();
     void renderBoundingBox() const;
-    void resolveCollisions(size_t _i,
-                                    std::vector<ngl::Vec4>& m_ppos,
-                                    std::vector<ngl::Vec3>& m_pdir,
-                                    std::vector<float>& m_psize);
+    void resolveCollisions(size_t _i, std::vector<ngl::Vec4>& io_ppos, std::vector<ngl::Vec3>& io_pdir, std::vector<float>& io_psize);
 
     float m_width = 100.0f;
     float m_height = 50.0f;

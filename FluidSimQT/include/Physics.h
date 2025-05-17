@@ -18,7 +18,7 @@ class Physics
 public:
     Physics(std::vector<ngl::Vec4>& m_ppos, std::vector<ngl::Vec3>& m_pdir);
     ~Physics() = default; // Destructor
-    float CalculateDensity(const ngl::Vec3& samplePoint, size_t m_maxParticles);
+    float CalculateDensity(const ngl::Vec3& c_samplePoint, size_t m_maxParticles);
     ngl::Vec3 calculateViscosityForce(size_t _particleIndex, size_t m_maxParticles) const;
     void calculateAllDensities(size_t m_maxParticles);
     float convertDensityToPressure(float _density) const;

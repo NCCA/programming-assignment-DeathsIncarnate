@@ -84,31 +84,31 @@ void BoundingBox::renderBoundingBox() const
 }
 
 
-void BoundingBox::resolveCollisions(size_t _i, std::vector<ngl::Vec4>& m_ppos, std::vector<ngl::Vec3>& m_pdir, std::vector<float>& m_psize)
+void BoundingBox::resolveCollisions(size_t _i, std::vector<ngl::Vec4>& io_ppos, std::vector<ngl::Vec3>& io_pdir, std::vector<float>& io_psize)
 {
     ngl::Vec3 boundSize(m_width, m_height, m_depth); // Proper bounding box
-    float collisionDamping = 0.5f; // Controls bounce effect
-    ngl::Vec3 halfBoundSize = boundSize * 0.5f - ngl::Vec3(1.0f, 1.0f, 1.0f) * m_psize[_i];
+    const float c_collisionDamping = 0.5f;
+    ngl::Vec3 halfBoundSize = boundSize * 0.5f - ngl::Vec3(1.0f, 1.0f, 1.0f) * io_psize[_i];
 
     // X-axis collision
-    if (std::abs(m_ppos[_i].m_x) > halfBoundSize.m_x)
+    if (std::abs(io_ppos[_i].m_x) > halfBoundSize.m_x)
     {
-        m_ppos[_i].m_x = halfBoundSize.m_x * (m_ppos[_i].m_x > 0 ? 1.0f : -1.0f);
-        m_pdir[_i].m_x *= -collisionDamping;
+        io_ppos[_i].m_x = halfBoundSize.m_x * (io_ppos[_i].m_x > 0 ? 1.0f : -1.0f);
+        io_pdir[_i].m_x *= -c_collisionDamping;
     }
 
     // Floor collision at y = 0
-     if (m_ppos[_i].m_y <= 0.0f)
+     if (io_ppos[_i].m_y <= 0.0f)
      {
-         m_ppos[_i].m_y = 0.0f;  // Stick to the floor
+         io_ppos[_i].m_y = 0.0f;  // Stick to the floor
          // // Reverse velocity and apply damping
          // m_pdir[_i].m_y = -std::abs(m_pdir[_i].m_y) * collisionDamping;
-         m_pdir[_i].m_y *= -collisionDamping;  // Reverse velocity
+         io_pdir[_i].m_y *= -c_collisionDamping;  // Reverse velocity
 
      // Small upward push to avoid getting stuck
-     if (std::abs(m_pdir[_i].m_y) < 0.1f)
+     if (std::abs(io_pdir[_i].m_y) < 0.1f)
      {
-         m_ppos[_i].m_y = 1.0f;
+         io_ppos[_i].m_y = 1.0f;
          // m_pdir[_i].m_y = 1.0f; // minimum bounce impulse
      }
      }
@@ -122,9 +122,9 @@ void BoundingBox::resolveCollisions(size_t _i, std::vector<ngl::Vec4>& m_ppos, s
     // }
 
     // Z-axis collision
-    if (std::abs(m_ppos[_i].m_z) > halfBoundSize.m_z)
+    if (std::abs(io_ppos[_i].m_z) > halfBoundSize.m_z)
     {
-        m_ppos[_i].m_z = halfBoundSize.m_z * (m_ppos[_i].m_z > 0 ? 1.0f : -1.0f);
-        m_pdir[_i].m_z *= -collisionDamping;
+        io_ppos[_i].m_z = halfBoundSize.m_z * (io_ppos[_i].m_z > 0 ? 1.0f : -1.0f);
+        io_pdir[_i].m_z *= -c_collisionDamping;
     }
 }

@@ -43,7 +43,7 @@ public :
 
  public slots :
 
-    void updateValues(double currentPressure, double currentViscosity, double currentParticleSpacing, double yoffSet, int width, int height, int depth);
+    void updateValues(double _currentPressure, double _currentViscosity, double _currentParticleSpacing, double _yoffSet, int _width, int _height, int _depth);
     void simulationCheck();
     void initialize();
 

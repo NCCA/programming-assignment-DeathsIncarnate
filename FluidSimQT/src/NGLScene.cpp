@@ -155,16 +155,16 @@ void NGLScene::processKeys()
   //m_emitter->move(dx, dy, dz);
 }
 
-void NGLScene::updateValues(double currentPressure, double currentViscosity,
-                          double currentParticleSpacing, double yOffset, int width, int height, int depth)
+void NGLScene::updateValues(double o_currentPressure, double o_currentViscosity,
+                          double o_currentParticleSpacing, double o_yOffset, int o_width, int o_height, int o_depth)
 {
-  m_emitter->m_physics->m_pressureMultiplier = static_cast<float>(currentPressure);
-  m_emitter->m_physics->m_viscosityStrength = static_cast<float>(currentViscosity);
-  m_emitter->m_physics->m_particleSpacing = static_cast<float>(currentParticleSpacing);
-  // m_emitter->m_boundingBox.m_width = width;
-  // m_emitter->m_boundingBox.m_height = height;
-  // m_emitter->m_boundingBox.m_depth = depth;
-  m_emitter->yOffset = static_cast<float>(yOffset);
+  m_emitter->m_physics->m_pressureMultiplier = static_cast<float>(o_currentPressure);
+  m_emitter->m_physics->m_viscosityStrength = static_cast<float>(o_currentViscosity);
+  m_emitter->m_physics->m_particleSpacing = static_cast<float>(o_currentParticleSpacing);
+  // m_emitter->m_boundingBox.m_width = o_width;
+  // m_emitter->m_boundingBox.m_height = o_height;
+  // m_emitter->m_boundingBox.m_depth = o_depth;
+  m_emitter->yOffset = static_cast<float>(o_yOffset);
 
 }
 
