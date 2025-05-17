@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public slots:
-        void getValues(double value);
+    void updateSimulationParameters();
 
 public:
     explicit MainWindow(QWidget *parent = 0);

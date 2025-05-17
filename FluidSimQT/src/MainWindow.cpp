@@ -28,13 +28,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
         try
         {
             connect(m_ui->doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                        this, &MainWindow::getValues);
+                        this, &MainWindow::updateSimulationParameters);
             connect(m_ui->doubleSpinBox_2, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                        this, &MainWindow::getValues);
+                        this, &MainWindow::updateSimulationParameters);
             connect(m_ui->doubleSpinBox_3, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                        this, &MainWindow::getValues);
+                        this, &MainWindow::updateSimulationParameters);
             connect(m_ui->doubleSpinBox_4, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                        this, &MainWindow::getValues);
+                        this, &MainWindow::updateSimulationParameters);
+            connect(m_ui->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+                    this, &MainWindow::updateSimulationParameters);
+            connect(m_ui->spinBox_2, QOverload<int>::of(&QSpinBox::valueChanged),
+                    this, &MainWindow::updateSimulationParameters);
+            connect(m_ui->spinBox_3, QOverload<int>::of(&QSpinBox::valueChanged),
+                    this, &MainWindow::updateSimulationParameters);
         }
         catch (const std::exception& e)
         {
@@ -46,9 +52,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
         {
             try
             {
-                m_boundingBox.m_width = static_cast<float>(m_ui->spinBox->value());
-                m_boundingBox.m_depth = static_cast<float>(m_ui->spinBox_3->value());
-                m_boundingBox.m_height = static_cast<float>(m_ui->spinBox_2->value());
 
                 if (m_gl)
                 {
@@ -88,61 +91,22 @@ MainWindow::~MainWindow()
     delete m_ui;
 }
 
-void MainWindow::getValues(double value)
+void MainWindow::updateSimulationParameters()
 {
-    try {
-        std::cout << "Updating simulation parameters..." << std::endl;
+    const double yOffset = m_ui->doubleSpinBox->value();
+    const double particleSpacing = m_ui->doubleSpinBox_2->value();
+    const double pressureMultiplier = m_ui->doubleSpinBox_3->value();
+    const double viscosityStrength = m_ui->doubleSpinBox_4->value();
+    const int width = m_ui->spinBox->value();
+    const int height = m_ui->spinBox_2->value();
+    const int depth = m_ui->spinBox_3->value();
 
-        // Defensive checks
-        if (!m_gl)
-        {
-            std::cerr << "Error: m_gl is null" << std::endl;
-            return;
-        }
+    std::cout << "Updating parameters:\n"
+              << "  yOffset: " << yOffset << "\n"
+              << "  particleSpacing: " << particleSpacing << "\n"
+              << "  pressureMultiplier: " << pressureMultiplier << "\n"
+              << "  viscosityStrength: " << viscosityStrength << "\n"
+              << "  Dimensions: " << width << "x" << height << "x" << depth << std::endl;
 
-        if (!m_ui)
-        {
-            std::cerr << "Error: m_ui is null" << std::endl;
-            return;
-        }
-
-        // Get current values from all spinboxes with safety checks
-        double yOffset = 0.0;
-        double particleSpacing = 0.0;
-        double pressureMultiplier = 0.0;
-        double viscosityStrength = 0.0;
-
-        try
-        {
-            yOffset = m_ui->doubleSpinBox->value();
-            std::cout << "yOffset: " << yOffset << std::endl;
-
-            particleSpacing = m_ui->doubleSpinBox_2->value();
-            std::cout << "particleSpacing: " << particleSpacing << std::endl;
-
-            pressureMultiplier = m_ui->doubleSpinBox_3->value();
-            std::cout << "pressureMultiplier: " << pressureMultiplier << std::endl;
-
-            viscosityStrength = m_ui->doubleSpinBox_4->value();
-            std::cout << "viscosityStrength: " << viscosityStrength << std::endl;
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << "Exception retrieving values: " << e.what() << std::endl;
-            return;
-        }
-
-        // Call updateValues with verbose output
-        std::cout << "Calling updateValues()..." << std::endl;
-        m_gl->updateValues(pressureMultiplier, viscosityStrength, particleSpacing, yOffset);
-        std::cout << "updateValues() completed successfully" << std::endl;
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Exception in getValues: " << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cerr << "Unknown exception in getValues" << std::endl;
-    }
+    m_gl->updateValues(pressureMultiplier, viscosityStrength, particleSpacing, yOffset, width, height, depth);
 }

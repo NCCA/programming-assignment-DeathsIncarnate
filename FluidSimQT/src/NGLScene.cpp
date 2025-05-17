@@ -156,11 +156,14 @@ void NGLScene::processKeys()
 }
 
 void NGLScene::updateValues(double currentPressure, double currentViscosity,
-                          double currentParticleSpacing, double yOffset)
+                          double currentParticleSpacing, double yOffset, int width, int height, int depth)
 {
   m_emitter->m_physics->m_pressureMultiplier = static_cast<float>(currentPressure);
   m_emitter->m_physics->m_viscosityStrength = static_cast<float>(currentViscosity);
   m_emitter->m_physics->m_particleSpacing = static_cast<float>(currentParticleSpacing);
+  // m_emitter->m_boundingBox.m_width = width;
+  // m_emitter->m_boundingBox.m_height = height;
+  // m_emitter->m_boundingBox.m_depth = depth;
   m_emitter->yOffset = static_cast<float>(yOffset);
 
 }
@@ -174,8 +177,7 @@ void NGLScene::initialize()
 {
   m_emitter->m_physics->m_maxParticles = 50000.0f;
   m_emitter->initializeParticles(m_emitter->yOffset, m_emitter->m_physics->m_particleSpacing, 50000);
-  // m_emitter->m_boundingBox.updateVAO();
-  // m_emitter->m_boundingBox.renderBoundingBox();
+  // m_emitter->m_boundingBox.initBoundingBoxVAO();
   // update();
 }
 
