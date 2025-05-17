@@ -49,7 +49,7 @@ https://youtu.be/Kcz7_Tj5SKw
 
 - There is alot of other variables but for user access these are the best variables to mess around with if you don't have any knowledge about SPH fluid simulations.
 
-### ALL variables work properly and can be changed manually in the code before running to effect the conditions. Only the drawing of the bounding box VAO when the initialisation button is pressed is not occurring properly as of yet; however if the values are changed before running the code the bounding box is drawn properly with those dimensions.
+#### ALL variables work properly and can be changed manually in the code before running to effect the conditions. Only the drawing of the bounding box VAO when the initialisation button is pressed is not occurring properly as of yet; however if the values are changed before running the code the bounding box is drawn properly with those dimensions.
 
 
 ![Screenshot from 2025-05-16 10-04-41](https://github.com/user-attachments/assets/2de94072-1abc-4a23-8a89-a69aec072acd)
