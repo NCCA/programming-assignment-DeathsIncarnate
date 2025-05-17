@@ -45,13 +45,13 @@ https://youtu.be/Kcz7_Tj5SKw
 ## Variables and Usage:
 - **pressureMultiplier** in **physics.h** effects how particles are seperated based of the amount of particles (density) within a certain radius(smoothing kernel.) Can be changed to make the particles more repulsive agaisnt eachother.
 - **viscosityStrength** in **physics.h** effects the movement of the particles and how they flow in a more similiar direction when the viscosity is higher.
-- **particleSpacing** effects the distant between particles when initialized and therefore the amount of particles in the intialized cube at the start. The cube will stay the same size having the same dimensions unless changed manually which it can be in the **initializeParticles** function. However the spacing between particles can be changed. The particle spacing currently directly effects the **smoothingKernel**. **Unfortunately the values from qt dont get passed through properly for this variable yet. Only can be changed manually in code**
+- **particleSpacing** effects the distant between particles when initialized and therefore the amount of particles in the intialized cube at the start. The cube will stay the same size having the same dimensions unless changed manually which it can be in the **initializeParticles** function. However the spacing between particles can be changed. The particle spacing currently directly effects the **smoothingKernel**. 
 - **m_width, m_height and m_depth** are the variables in **BoundingBox.h** that can change the physical dimensions of the m_boxVAO and how it is drawn and resolves collisions.**Unfortunately the values from qt dont get passed through properly for this variable yet. Only can be changed manually in code**
 - **yOffset** found in **initializeParticles** effects how high the cube is in the y-axis when initialzed.
 
 - There is alot of other variables but for user access these are the best variables to mess around with if you don't have any knowledge about SPH fluid simulations.
 
-### ALL variables work properly and can be changed manually in the code before running to effect the conditions. Unfortunately not all of the qt values are able to be transferred to these variables as of yet. The variables are all the variables that can be changed to effect this simulation.
+### ALL variables work properly and can be changed manually in the code before running to effect the conditions. The variables are all the variables that can be changed to effect this simulation. Only the drawing of the bounding box VAO when the initialisation button is pressed is not occurring properly as of yet; however if the values are changd before running the code the bounding box is drawn properly with those dimensions.
 
 
 ![Screenshot from 2025-05-16 10-04-41](https://github.com/user-attachments/assets/2de94072-1abc-4a23-8a89-a69aec072acd)
@@ -68,11 +68,11 @@ https://youtu.be/Kcz7_Tj5SKw
 - shaders: ParticleFragment.glsl, ParticleVertex.glsl
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Evaluation and Potential improvements:
-I ran into a few issues with my code especially when dealing with VAOS and QT where VAOS weren't intialized or acessed properly to be drawn and that the values in QT were'nt being passed through into the variables and my header files. I also ran into an issue where my smoothing kernel value was directly effecting my density value which shouldn't be happening. Also my particles were slowly but surely merging with the ground at y=0. Unfortnately these were the errors I wasn't able to fix directly. I had other errors that i ran into that I was able to completely and safely resolve but for these problems I had to work around them. I got some of the QT values passing through properly by referncing multiple pointers to make sure values were accessed afetr being initialized and not null. I managed to temporarily fix the particles combining at y=0 by adding a minimum repulsive force from the floor. Overal if I had more time i know what I would adapt and try to fix to make my fluid simulation running more efficiently and better.
+I ran into an issue where my smoothing kernel value was directly effecting my density value which shouldn't be happening. Also my particles were slowly but surely merging with the ground at y=0. Unfortunately these were the errors I wasn't able to fix directly. I had other errors that I ran into that I was able to completely and safely resolve but for these problems I had to work around them. All my QT values were eventually able to pass through to my variables in each respective header and adapt in real time the fluid simulation, but unfotantely I wasn't able to change the bounding box VAO and how it was drawn based of these varibales so I commented out the passing throiugh of the dimension variables. I managed to temporarily fix the particles combining at y=0 by adding a minimum repulsive force from the floor. Overal if I had more time I know what I would adapt and try to fix to make my fluid simulation running more efficiently and better.
 
 
 - I would've liked to include a spatial hashing system in order to speed up calculations as less not all densities would be calculated and only the densities within the smoothing kernel.
-- I would've liked if my values from QT were properly passed and assessable within my functions to allow for better user interface for changing ther variables.
+- I would've liked if my bounding box values fropm QT were able to affect the drawing off the bounding box VAO.
 - I wanted to allow the user to effect the fluid with repulsion and attraction mechanics around the mouse cursor.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
