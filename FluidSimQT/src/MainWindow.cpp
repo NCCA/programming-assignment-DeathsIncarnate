@@ -23,6 +23,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
         // Add GL widget to layout
         m_ui->s_mainWindowGridLayout->addWidget(m_gl, 0, 0, 2, 1);
 
+
+        // Connect all value spinboxes to update simulation parameters - use newer syntax with error checking
+        try
+        {
+            connect(m_ui->doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                        this, &MainWindow::getValues);
+            connect(m_ui->doubleSpinBox_2, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                        this, &MainWindow::getValues);
+            connect(m_ui->doubleSpinBox_3, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                        this, &MainWindow::getValues);
+            connect(m_ui->doubleSpinBox_4, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                        this, &MainWindow::getValues);
+        }
+        catch (const std::exception& e)
+        {
+                std::cerr << "Exception connecting signals: " << e.what() << std::endl;
+        }
+
         // Connect bounding box update button
         connect(m_ui->pushButton_2, &QPushButton::pressed, this, [this]()
         {
@@ -42,23 +60,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), m_ui(new Ui::Main
                 std::cerr << "Exception in button handler: " << e.what() << std::endl;
             }
         });
-
-        // Connect all value spinboxes to update simulation parameters - use newer syntax with error checking
-        try
-        {
-            connect(m_ui->doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                        this, &MainWindow::getValues);
-            connect(m_ui->doubleSpinBox_2, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                        this, &MainWindow::getValues);
-            connect(m_ui->doubleSpinBox_3, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                        this, &MainWindow::getValues);
-            connect(m_ui->doubleSpinBox_4, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                        this, &MainWindow::getValues);
-        }
-        catch (const std::exception& e)
-        {
-                std::cerr << "Exception connecting signals: " << e.what() << std::endl;
-        }
 
         // Connect simulation toggle button
         try

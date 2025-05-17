@@ -39,7 +39,7 @@ public:
 
     float m_smoothingRadius = 2 * m_particleSpacing;   // Adjust based on scale
 
-    size_t m_maxParticles;
+    size_t m_maxParticles = 50000;
 
 
 private:

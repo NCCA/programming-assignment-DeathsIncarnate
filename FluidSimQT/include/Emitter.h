@@ -34,8 +34,9 @@ class Emitter
     void setCursorPos(const ngl::Vec3 &_pos, float _radius, float _strength);
     void toggleCursorInteraction() { m_cursorInteraction = !m_cursorInteraction; }
     float yOffset = 20.0f;
-    void initializeParticles(float yOffset);
+    void initializeParticles(float yOffset, float particleSpacing, size_t maxParticles);
     std::unique_ptr<Physics> m_physics;
+
 
     BoundingBox m_boundingBox;
 
@@ -54,7 +55,7 @@ class Emitter
     std::vector<int> m_plife;
     enum class ParticleState : bool {Active, Dead};
     std::vector<ParticleState> m_pstate;
-    size_t m_maxParticles;
+    size_t m_maxParticles = m_physics->m_maxParticles;
     size_t m_maxAlive = 1000;
     size_t m_numPerFrame = 120;
 

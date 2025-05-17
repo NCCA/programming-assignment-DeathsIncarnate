@@ -45,7 +45,7 @@ m_maxParticles{_num}, m_maxAlive{_maxAlive}, m_numPerFrame{_numPerFrame}, m_ppos
     m_spatialLookup.resize(m_maxParticles);
     m_startIndices.resize(m_maxParticles, std::numeric_limits<size_t>::max());
 
-    initializeParticles(yOffset);
+    initializeParticles(yOffset, m_physics->m_particleSpacing, m_physics->m_maxParticles);
 
     //m_vao = ngl::VAOFactory::createVAO(ngl::simpleVAO, GL_POINTS);
     m_vao = ngl::vaoFactoryCast<ngl::MultiBufferVAO>(ngl::VAOFactory::createVAO(ngl::multiBufferVAO, GL_POINTS));
@@ -304,14 +304,19 @@ void Emitter::update(float _dt)
 
 
 
-void Emitter::initializeParticles(float yOffset)
+void Emitter::initializeParticles(float yOffset, float particleSpacing, size_t maxParticles)
 {
     const float cubeSideLength = 25.0f; // Fixed 1000x1000x1000 volume
     const float jitterStrength = 0.0f;
     const float initialLife = 100.0f;
     const float baseVelocityY = 2.0f;
-    const float particleSpacing = m_physics->m_particleSpacing; // Adjusts density
+    // const float particleSpacing = m_physics->m_particleSpacing; // Adjusts density
+    // Set uniform particle size
 
+    for (size_t i = 0; i < maxParticles; ++i)
+    {
+        m_psize[i] = 0.1f; // Or your preferred size
+    }
 
     // Calculate particles per axis based on spacing and size
     const float effectiveParticleDiameter = m_psize[0] * 2 + particleSpacing;
@@ -321,25 +326,28 @@ void Emitter::initializeParticles(float yOffset)
     const size_t particlesThatFit = particlesPerAxis * particlesPerAxis * particlesPerAxis;
 
     // Update max particles to match what actually fits
-    m_maxParticles = std::min(m_maxParticles, particlesThatFit);
+    m_maxParticles= std::min(maxParticles, particlesThatFit);
+
+    // Update max particles to match what actually fits
+    maxParticles = std::min(maxParticles, particlesThatFit);
 
     // Recalculate actual side length to maintain exact volume
     const float actualSideLength = particlesPerAxis * effectiveParticleDiameter;
     const float halfLength = actualSideLength * 0.5f;
 
     // Set uniform particle size
-    for (size_t i = 0; i < m_maxParticles; ++i)
+    for (size_t i = 0; i < maxParticles; ++i)
     {
         m_psize[i] = 4.0f; // Or your preferred size
     }
 
     // Place particles in perfect grid
     size_t particleIndex = 0;
-    for (int x = 0; x < particlesPerAxis && particleIndex < m_maxParticles; ++x)
+    for (int x = 0; x < particlesPerAxis && particleIndex < maxParticles; ++x)
     {
-        for (int y = 0; y < particlesPerAxis && particleIndex < m_maxParticles; ++y)
+        for (int y = 0; y < particlesPerAxis && particleIndex < maxParticles; ++y)
         {
-            for (int z = 0; z < particlesPerAxis && particleIndex < m_maxParticles; ++z)
+            for (int z = 0; z < particlesPerAxis && particleIndex < maxParticles; ++z)
             {
                 // Calculate grid position (centered around origin)
                 float px = x * effectiveParticleDiameter - halfLength;
