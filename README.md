@@ -11,16 +11,16 @@ I wanted to create an SPH fluid simulation that applies the physics off of water
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ##  Video:
 ### This video is the most updated video on how the fluid simulation works with the QT controls:
- https://youtu.be/TiQEhSULAbs 
+https://youtu.be/TiQEhSULAbs 
 
-How the fluid simulation looks with the optimum recommended values.
+How the fluid simulation looks with the optimum recommended values:
 https://youtu.be/GjH93HdGTUc
 
-Iterations trying to work through QT problems.
+Iterations trying to work through QT problems:
 https://youtu.be/XdgDH1SLI6Q 
 https://youtu.be/DP7xY7tK5vg 
 
-FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI controls; all changes to variables have to be manual.)
+FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI controls; all changes to variables have to be manual.):
 https://youtu.be/Kcz7_Tj5SKw 
 
 
