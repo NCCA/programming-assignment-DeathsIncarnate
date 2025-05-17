@@ -1,4 +1,4 @@
-# Jacques Moss s5616052 CFGAA Assigment
+# Jacques Moss s5616052 CFGAA Assignment:
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Report for my Assignment:
 
@@ -32,7 +32,7 @@ https://youtu.be/Kcz7_Tj5SKw
 - Within Clion make sure to go to your build in the top right corner and link your copyshaders to the build using cmake target.
 - Press ctrl + f5/ build and run using the buttons in the top right corner.
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-## What my code does:
+## What my Code does:
 
 - Uses ParticleSOA by Jon Macey to create a particle system.
 - Calculates density, pressure and viscosity and applys to the particles based off acceleration and closeness of other particles.
@@ -65,8 +65,12 @@ https://youtu.be/Kcz7_Tj5SKw
 - ui: MainWindow.ui
 - shaders: ParticleFragment.glsl, ParticleVertex.glsl
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-## Evaluation and Potential improvements:
+## Evaluation and Potential Improvements:
 I ran into an issue where my smoothing kernel value was directly effecting my density value which shouldn't be happening. Also my particles were slowly merging with the ground at y=0. I managed to temporarily fix the particles combining at y=0 by adding a minimum repulsive force from the floor. I had other errors that I ran into that I was able to completely and safely resolve but for these problems I had to work around them. All my QT values were eventually able to pass through to my variables in each respective header and adapt in real time the fluid simulation, but unfortunately I wasn't able to change the bounding box VAO and how it was drawn based of these variables, so I commented out the passing throiugh of the dimension variables.  Overall if I had more time I know what I would adapt and try to fix to make my fluid simulation running more efficiently and better.
+
+Uncomment this code in NGLScene.cpp if you want the inputted dimensions in the QT width, height and depth inputs to affect the collision resolving. However the drawn red box will not match this new collision boundary.
+
+![Screenshot from 2025-05-17 16-01-04](https://github.com/user-attachments/assets/86ba0e04-b0ce-455b-ac0d-967a7b558f34)
 
 
 - I would've liked to include a spatial hashing system in order to speed up calculations as less not all densities would be calculated and only the densities within the smoothing kernel.
