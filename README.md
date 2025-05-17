@@ -11,18 +11,15 @@ I wanted to create an SPH fluid simulation that applies the physics off of water
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ##  Video:
 
-The first video shows how it simulates a fluid simulation quite accurately at the right recommended intialization of floats. The second video shows how the variables can be changed such as bounding box dimensions, all physics values and even starting intialization before runing with manual changing of the variables eg. m_pressureMultiplier, m_viscosityStrength and m_particleSpacing in physics.h. Particle spacing involves the amount of particles initially distributed within the square and therefore directly affects how many particles are in the scene. Also the dimensions of the bounding box can be changed in BoundingBox.h with the measurements affecting the bounds collisions as well as there VAO.
 
+How the fluid simulation looks with the optimum recommended values.
 https://youtu.be/GjH93HdGTUc
 
+Iterations trying to work through QT problems.
 https://youtu.be/XdgDH1SLI6Q 
-
-Messing with the working variables in QT. PressureMultiplier, ViscosityStrength and yOffset. As well as the 2 buttons.
-
 https://youtu.be/DP7xY7tK5vg 
 
 FluidSim (Non-QT version; with faster and more accurate fluid movement but no UI controls; all changes to variables have to be manual.)
-
 https://youtu.be/Kcz7_Tj5SKw 
 
 
