@@ -10,7 +10,8 @@ I wanted to create an SPH fluid simulation that applies the physics off of water
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 ##  Video:
-
+### This video is the most updated video on how the fluid simulation works with the QT controls:
+ https://youtu.be/TiQEhSULAbs 
 
 How the fluid simulation looks with the optimum recommended values.
 https://youtu.be/GjH93HdGTUc
